@@ -26,4 +26,6 @@ allprojects {
 
 dependencies {
     compile 'com.github.Minestom:Minestom:dc5b764732'
+    implementation "net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT"
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }

@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.asthcore.Interfaces;
 
 public interface Serializable {
 
