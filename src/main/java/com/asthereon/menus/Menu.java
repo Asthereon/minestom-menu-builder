@@ -23,6 +23,7 @@ public class Menu {
     private List<MenuPlaceholder> menuPlaceholders;
     private HashMap<String, MenuSection> sections;
     private List<Consumer<String>> onSave = new ArrayList<>();
+    private List<Consumer<Player>> onLoad = new ArrayList<>();
     private boolean dirty = true;
 
 
@@ -90,6 +91,7 @@ public class Menu {
     public void redraw() {
         Set<Player> players = inventory.getViewers();
         List<Integer> storageSlots = inventory.storageSlots;
+        String serializedData = inventory.serialize();
 
         for (Player player : players) {
             MenuManager.closeInventoryEvent(player, player.getOpenInventory());
@@ -98,6 +100,7 @@ public class Menu {
         // Make sure non-button items are copied over to the new inventory or stuff like banks will be impossible
         inventory = new MenuInventory(inventory.getInventoryType(), inventory.getTitle());
         inventory.storageSlots(storageSlots);
+        inventory.deserialize(serializedData);
 
         if (readOnly != null) {
             inventory.addInventoryCondition(readOnly);
@@ -125,10 +128,11 @@ public class Menu {
     }
 
     public void open(Player player) {
+        MenuManager.closeInventoryEvent(player, player.getOpenInventory());
+        load(player);
         if (dirty) {
             redraw();
         }
-        MenuManager.closeInventoryEvent(player, player.getOpenInventory());
         player.openInventory(inventory);
     }
 
@@ -154,6 +158,16 @@ public class Menu {
     private void save(String serializedData) {
         for (Consumer<String> saveFunction : onSave) {
             saveFunction.accept(serializedData);
+        }
+    }
+
+    public void bindToLoad(Consumer<Player> loadFunction) {
+        onLoad.add(loadFunction);
+    }
+
+    private void load(Player player) {
+        for (Consumer<Player> loadFunction : onLoad) {
+            loadFunction.accept(player);
         }
     }
 

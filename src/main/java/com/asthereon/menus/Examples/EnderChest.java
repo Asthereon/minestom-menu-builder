@@ -14,12 +14,14 @@ public class EnderChest {
 
     public void open(Player player) {
         StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest", new StorageOptions(), new FileStorageSystem());
-        String storageData = Base64.encodeBase64String(storageLocation.get(player.getUuid().toString()));
         Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, player.getUsername() + "'s Ender Chest")
-                .storageData(storageData)
                 .build();
         menu.bindToSave((serializedData) -> {
             storageLocation.set(player.getUuid().toString(), Base64.decodeBase64(serializedData));
+        });
+        menu.bindToLoad((player1) -> {
+            String storageData = Base64.encodeBase64String(storageLocation.get(player.getUuid().toString()));
+            menu.getInventory().deserialize(storageData);
         });
         menu.open(player);
     }
