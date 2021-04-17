@@ -1,7 +1,12 @@
 package com.asthereon.menus;
 
 import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.inventory.InventoryCloseEvent;
+import net.minestom.server.event.inventory.InventoryOpenEvent;
+import net.minestom.server.inventory.Inventory;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -23,6 +28,31 @@ public class MenuManager {
     // Get Instance of class
     public static MenuManager getInstance() {
         return instance;
+    }
+
+    public static void init() {
+        GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+
+        globalEventHandler.addEventCallback(InventoryCloseEvent.class, event -> closeInventoryEvent(event.getPlayer(), event.getInventory()));
+
+        globalEventHandler.addEventCallback(InventoryOpenEvent.class, event -> closeInventoryEvent(event.getPlayer(), event.getPlayer().getOpenInventory()));
+
+
+    }
+
+    private static void closeInventoryEvent(Player player, Inventory inventory) {
+        if (inventory != null) {
+            if (MenuManager.getInstance().isMenu(player,inventory.getTitle())) {
+                System.out.println("MENU CLOSED");
+                Menu menu = MenuManager.getInstance().getMenu(player);
+                if (null != menu) {
+                    String serializedData = menu.closeEvent(player);
+                    System.out.println("CLOSE EVENT: "+serializedData);
+                }
+            } else {
+                System.out.println("NON-MENU CLOSED");
+            }
+        }
     }
 
     public static void register(Menu menu) {
