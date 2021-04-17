@@ -91,6 +91,10 @@ public class Menu {
         Set<Player> players = inventory.getViewers();
         List<Integer> storageSlots = inventory.storageSlots;
 
+        for (Player player : players) {
+            MenuManager.closeInventoryEvent(player, player.getOpenInventory());
+        }
+
         // Make sure non-button items are copied over to the new inventory or stuff like banks will be impossible
         inventory = new MenuInventory(inventory.getInventoryType(), inventory.getTitle());
         inventory.storageSlots(storageSlots);
@@ -124,6 +128,7 @@ public class Menu {
         if (dirty) {
             redraw();
         }
+        MenuManager.closeInventoryEvent(player, player.getOpenInventory());
         player.openInventory(inventory);
     }
 

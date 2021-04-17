@@ -40,7 +40,7 @@ public class MenuManager {
 
     }
 
-    private static void closeInventoryEvent(Player player, Inventory inventory) {
+    public static void closeInventoryEvent(Player player, Inventory inventory) {
         if (inventory != null) {
             if (MenuManager.getInstance().isMenu(player,inventory.getTitle())) {
                 System.out.println("MENU CLOSED");
