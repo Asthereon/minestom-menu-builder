@@ -21,6 +21,7 @@ public class EnderChest {
         menu.bindToSave((serializedData) -> {
             storageLocation.set(player.getUuid().toString(), Base64.decodeBase64(serializedData));
         });
+        menu.open(player);
     }
 
 }
