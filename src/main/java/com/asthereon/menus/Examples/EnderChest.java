@@ -13,7 +13,7 @@ import org.apache.commons.codec.binary.Base64;
 public class EnderChest {
 
     public void open(Player player) {
-        StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest/" + player.getUuid().toString(), new StorageOptions(), new FileStorageSystem());
+        StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest", new StorageOptions(), new FileStorageSystem());
         String storageData = Base64.encodeBase64String(storageLocation.get(player.getUuid().toString()));
         Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, player.getUsername() + "'s Ender Chest")
                 .storageData(storageData)
