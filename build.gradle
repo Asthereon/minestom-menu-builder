@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id 'maven'
+}
+
+group 'com.asthereon'
+version '1.0'
+
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://libraries.minecraft.net' }
+        maven { url 'https://jitpack.io' }
+        maven {
+            name 'sponge'
+            url 'https://repo.spongepowered.org/maven'
+        }
+        maven {
+            url "https://repo.velocitypowered.com/snapshots/"
+        }
+    }
+}
+
+dependencies {
+    compile 'com.github.Minestom:Minestom:dc5b764732'
+}
