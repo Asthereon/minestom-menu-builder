@@ -14,6 +14,7 @@ public class MenuBuilder {
     private final MenuInventory inventory;
     private String storageData = null;
     private boolean readOnly = false;
+    private UUID uuid;
     private List<Integer> readOnlySlots = new ArrayList<>();
     private List<MenuButton> buttons = new ArrayList<>();
     private List<MenuPlaceholder> menuPlaceholders = new ArrayList<>();
@@ -21,6 +22,7 @@ public class MenuBuilder {
 
     public MenuBuilder(InventoryType inventoryType, String title) {
         this.inventory = new MenuInventory(inventoryType, Component.text(title));
+        this.uuid = UUID.randomUUID();
     }
 
     public static MenuBuilder of(InventoryType inventoryType, String title) {
@@ -147,7 +149,7 @@ public class MenuBuilder {
             }
         }
 
-        Menu menu = new Menu(inventory, readOnlyCondition, buttons, sections, menuPlaceholders, storageData);
+        Menu menu = new Menu(uuid, inventory, readOnlyCondition, buttons, sections, menuPlaceholders, storageData);
 
         if (!readOnly) {
             // IF there are read only slots, that means there should be storage slots so set those on the menu

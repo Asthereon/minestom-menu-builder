@@ -12,10 +12,10 @@ import org.apache.commons.codec.binary.Base64;
 
 public class EnderChest {
 
+    private static final StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest", new StorageOptions(), new FileStorageSystem());
+
     public void open(Player player) {
-        StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest", new StorageOptions(), new FileStorageSystem());
-        Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, player.getUsername() + "'s Ender Chest")
-                .build();
+        Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, player.getUsername() + "'s Ender Chest").build();
         menu.bindToSave((serializedData) -> {
             storageLocation.set(player.getUuid().toString(), Base64.decodeBase64(serializedData));
         });

@@ -24,11 +24,13 @@ public class Menu {
     private HashMap<String, MenuSection> sections;
     private List<Consumer<String>> onSave = new ArrayList<>();
     private List<Consumer<Player>> onLoad = new ArrayList<>();
+    private HashMap<String, String> metadata = new HashMap<>();
     private boolean dirty = true;
 
-
-    public Menu(MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuPlaceholder> menuPlaceholders, String storageData) {
-        this.uuid = UUID.randomUUID();
+    // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
+    // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
+    public Menu(UUID uuid, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuPlaceholder> menuPlaceholders, String storageData) {
+        this.uuid = uuid;
         this.inventory = inventory;
         this.readOnly = readOnly;
         this.buttons = buttons;
@@ -93,9 +95,10 @@ public class Menu {
         List<Integer> storageSlots = inventory.storageSlots;
         String serializedData = inventory.serialize();
 
-        for (Player player : players) {
-            MenuManager.closeInventoryEvent(player, player.getOpenInventory());
-        }
+        // TODO: 4/20/2021 It looks like this close inventory event combined with the one in Menu.open() are causing double saves
+//        for (Player player : players) {
+//            MenuManager.closeInventoryEvent(player, player.getOpenInventory());
+//        }
 
         // Make sure non-button items are copied over to the new inventory or stuff like banks will be impossible
         inventory = new MenuInventory(inventory.getInventoryType(), inventory.getTitle());
@@ -128,11 +131,10 @@ public class Menu {
     }
 
     public void open(Player player) {
-        MenuManager.closeInventoryEvent(player, player.getOpenInventory());
+        //MenuManager.closeInventoryEvent(player, player.getOpenInventory());
+        // TODO: 4/20/2021 Need to differentiate between a close due to another menu opening, and closing current menu, so that closing the current menu will save the current tab
         load(player);
-        if (dirty) {
-            redraw();
-        }
+        redraw();
         player.openInventory(inventory);
     }
 
@@ -194,6 +196,14 @@ public class Menu {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public String getMetadata(String key, String defaultValue) {
+        return metadata.getOrDefault(key,defaultValue);
+    }
+
+    public void setMetadata(String key, String value) {
+        metadata.put(key,value);
     }
 }
 

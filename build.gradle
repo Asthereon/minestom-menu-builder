@@ -25,5 +25,14 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.Minestom:Minestom:dc5b764732'
+    compile 'com.github.Minestom:Minestom:1daaeda63f'
+    implementation 'com.github.Asthereon:minestom-asthcore:0c0795f67d'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.asthereon.menus.TestServer',
+                "Multi-Release": true
+    }
+    archivesBaseName = 'server'
 }

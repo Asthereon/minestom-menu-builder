@@ -1,5 +1,6 @@
 package com.asthereon.menus;
 
+import com.asthereon.asthcore.Interfaces.Serializable;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
@@ -70,17 +71,19 @@ public class MenuInventory extends Inventory implements Serializable {
 
     @Override
     public void deserialize(String data) {
-        BinaryReader binaryReader = new BinaryReader(Base64.decodeBase64(data));
-        try {
-            int slot = binaryReader.readInt();
-            ItemStack itemStack = binaryReader.readItemStack();
-            while (null != itemStack) {
-                setItemStack(slot, itemStack);
-                slot = binaryReader.readInt();
-                itemStack = binaryReader.readItemStack();
-            }
-        } catch (Exception ignored) {
+        if (data != null) {
+            BinaryReader binaryReader = new BinaryReader(Base64.decodeBase64(data));
+            try {
+                int slot = binaryReader.readInt();
+                ItemStack itemStack = binaryReader.readItemStack();
+                while (null != itemStack) {
+                    setItemStack(slot, itemStack);
+                    slot = binaryReader.readInt();
+                    itemStack = binaryReader.readItemStack();
+                }
+            } catch (Exception ignored) {
 
+            }
         }
     }
 }

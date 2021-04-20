@@ -1,5 +1,6 @@
 package com.asthereon.menus.Buttons;
 
+import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuClickType;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
@@ -7,6 +8,7 @@ import net.minestom.server.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MenuButton {
 
@@ -14,7 +16,7 @@ public class MenuButton {
     private List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();
 
-    public MenuButton() { }
+    private MenuButton() { }
 
     public static MenuButton slot(int slotID) {
         MenuButton menuButton = new MenuButton();
