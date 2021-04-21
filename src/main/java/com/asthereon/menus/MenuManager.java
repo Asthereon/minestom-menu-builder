@@ -89,8 +89,12 @@ public class MenuManager {
     }
 
     @Nullable
-    public Menu getMenu(UUID uuid) {
+    private Menu _getMenu(UUID uuid) {
         return menus.getOrDefault(uuid, null);
+    }
+
+    public static Menu getMenu(UUID uuid) {
+        return MenuManager.getInstance()._getMenu(uuid);
     }
 
     @Nullable
@@ -104,7 +108,7 @@ public class MenuManager {
     }
 
     public static void redraw(UUID uuid) {
-        Menu menu = getInstance().getMenu(uuid);
+        Menu menu = getMenu(uuid);
         if (null != menu) {
             menu.redraw();
         }

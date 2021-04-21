@@ -5,6 +5,8 @@ import com.asthereon.menus.Buttons.MenuPlaceholder;
 import com.asthereon.menus.Buttons.PageButton;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.data.Data;
+import net.minestom.server.data.DataImpl;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.condition.InventoryCondition;
@@ -24,13 +26,14 @@ public class Menu {
     private HashMap<String, MenuSection> sections;
     private List<Consumer<String>> onSave = new ArrayList<>();
     private List<Consumer<Player>> onLoad = new ArrayList<>();
-    private HashMap<String, String> metadata = new HashMap<>();
+    private Data metadata;
     private boolean dirty = true;
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
     // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
-    public Menu(UUID uuid, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuPlaceholder> menuPlaceholders, String storageData) {
+    public Menu(UUID uuid, Data metadata, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuPlaceholder> menuPlaceholders, String storageData) {
         this.uuid = uuid;
+        this.metadata = metadata;
         this.inventory = inventory;
         this.readOnly = readOnly;
         this.buttons = buttons;
@@ -198,12 +201,16 @@ public class Menu {
         return uuid;
     }
 
-    public String getMetadata(String key, String defaultValue) {
-        return metadata.getOrDefault(key,defaultValue);
+    public Data getMetadata() {
+        return metadata;
     }
 
-    public void setMetadata(String key, String value) {
-        metadata.put(key,value);
+    public <T> T getMetadata(String key, T defaultValue) {
+        return metadata.getOrDefault(key, defaultValue);
     }
+
+    public <T> void setMetadata(String key, T value, Class<T> type) { metadata.set(key, value, type); }
+
+    public <T> void setMetadata(String key, T value) { metadata.set(key, value); }
 }
 

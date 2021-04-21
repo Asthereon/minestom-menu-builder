@@ -3,11 +3,14 @@ package com.asthereon.menus;
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuPlaceholder;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.data.Data;
+import net.minestom.server.data.DataImpl;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class MenuBuilder {
 
@@ -19,6 +22,7 @@ public class MenuBuilder {
     private List<MenuButton> buttons = new ArrayList<>();
     private List<MenuPlaceholder> menuPlaceholders = new ArrayList<>();
     private HashMap<String, MenuSection> sections = new HashMap<>();
+    private Data metadata = new DataImpl();
 
     public MenuBuilder(InventoryType inventoryType, String title) {
         this.inventory = new MenuInventory(inventoryType, Component.text(title));
@@ -56,41 +60,60 @@ public class MenuBuilder {
         return this;
     }
 
-    public MenuBuilder bindToSlot(int slotID, Runnable callback) {
+    public MenuBuilder metadata(Data metadata) {
+        if (metadata != null) {
+            this.metadata = metadata;
+        }
+        return this;
+    }
+
+    public MenuBuilder bindToSlot(int slotID, Consumer<Menu> callback) {
         this.inventory.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
             if (slot == slotID) {
                 player.sendMessage(Component.text(clickType.toString()));
-                callback.run();
+                Menu menu = MenuManager.getMenu(uuid);
+                if (null != menu) {
+                    callback.accept(menu);
+                }
             }
         });
         return this;
     }
 
-    public MenuBuilder bindToSlot(int slotID, MenuClickType menuClickType, Runnable callback) {
+    public MenuBuilder bindToSlot(int slotID, MenuClickType menuClickType, Consumer<Menu> callback) {
         this.inventory.addInventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
             if (slot == slotID) {
                 if (menuClickType.toString().equals(clickType.toString())) {
-                    callback.run();
+                    Menu menu = MenuManager.getMenu(uuid);
+                    if (null != menu) {
+                        callback.accept(menu);
+                    }
                 }
             }
         }));
         return this;
     }
 
-    public MenuBuilder bindToSlotRange(int minimumSlotID, int maximumSlotID, Runnable callback) {
+    public MenuBuilder bindToSlotRange(int minimumSlotID, int maximumSlotID, Consumer<Menu> callback) {
         this.inventory.addInventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
             if (slot >= minimumSlotID && slot <= maximumSlotID) {
-                callback.run();
+                Menu menu = MenuManager.getMenu(uuid);
+                if (null != menu) {
+                    callback.accept(menu);
+                }
             }
         }));
         return this;
     }
 
-    public MenuBuilder bindToSlotRange(int minimumSlotID, int maximumSlotID, MenuClickType menuClickType, Runnable callback) {
+    public MenuBuilder bindToSlotRange(int minimumSlotID, int maximumSlotID, MenuClickType menuClickType, Consumer<Menu> callback) {
         this.inventory.addInventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
             if (slot >= minimumSlotID && slot <= maximumSlotID) {
                 if (menuClickType.toString().equals(clickType.toString())) {
-                    callback.run();
+                    Menu menu = MenuManager.getMenu(uuid);
+                    if (null != menu) {
+                        callback.accept(menu);
+                    }
                 }
             }
         }));
@@ -132,6 +155,10 @@ public class MenuBuilder {
         return this;
     }
 
+    public MenuButton createMenuButton() {
+        return MenuButton.on(uuid);
+    }
+
     public Menu build() {
         InventoryCondition readOnlyCondition = null;
 
@@ -149,7 +176,7 @@ public class MenuBuilder {
             }
         }
 
-        Menu menu = new Menu(uuid, inventory, readOnlyCondition, buttons, sections, menuPlaceholders, storageData);
+        Menu menu = new Menu(uuid, metadata, inventory, readOnlyCondition, buttons, sections, menuPlaceholders, storageData);
 
         if (!readOnly) {
             // IF there are read only slots, that means there should be storage slots so set those on the menu

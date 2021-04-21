@@ -90,7 +90,7 @@ public class MenuSection {
     }
 
     public void draw() {
-        Menu menu = MenuManager.getInstance().getMenu(menuID);
+        Menu menu = MenuManager.getMenu(menuID);
         if (null != menu) {
             if (slots.size() > 0) {
                 if (buttons.size() > 0) {
