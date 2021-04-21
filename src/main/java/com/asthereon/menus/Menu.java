@@ -27,7 +27,6 @@ public class Menu {
     private List<Consumer<String>> onSave = new ArrayList<>();
     private List<Consumer<Player>> onLoad = new ArrayList<>();
     private Data metadata;
-    private boolean dirty = true;
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
     // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
@@ -129,8 +128,6 @@ public class Menu {
         for (Player player : players) {
             player.openInventory(inventory);
         }
-
-        dirty = false;
     }
 
     public void open(Player player) {
