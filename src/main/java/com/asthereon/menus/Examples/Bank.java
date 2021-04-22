@@ -10,6 +10,7 @@ import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
 import net.minestom.server.entity.Player;
@@ -31,7 +32,7 @@ public class Bank {
                 .mask("RRRRRRRRR");
 
         // Create a MenuBuilder with 6 rows and give it a title
-        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, player.getUsername() + "'s Bank")
+        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text(player.getUsername() + "'s Bank"))
                 // Set the top row of the menu to be read only (unable to be modified with click events)
                 .readOnlySlots(schema.getSlots('R'))
                 // Transfer any existing metadata from a menu refresh due to tab changes

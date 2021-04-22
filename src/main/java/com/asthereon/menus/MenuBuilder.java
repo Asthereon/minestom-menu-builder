@@ -24,12 +24,12 @@ public class MenuBuilder {
     private HashMap<String, MenuSection> sections = new HashMap<>();
     private Data metadata = new DataImpl();
 
-    public MenuBuilder(InventoryType inventoryType, String title) {
-        this.inventory = new MenuInventory(inventoryType, Component.text(title));
+    public MenuBuilder(InventoryType inventoryType, Component title) {
+        this.inventory = new MenuInventory(inventoryType, title);
         this.uuid = UUID.randomUUID();
     }
 
-    public static MenuBuilder of(InventoryType inventoryType, String title) {
+    public static MenuBuilder of(InventoryType inventoryType, Component title) {
         return new MenuBuilder(inventoryType, title);
     }
 

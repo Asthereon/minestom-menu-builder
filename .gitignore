@@ -2,8 +2,13 @@
 /.gradle/
 /.idea/
 /build/
+*.class
+
+#  Dot prefix
+.*
 
 # Minestom
 /.minestom_tmp/
 /.mixin.out/
 /extensions/
+/minecraft_data/

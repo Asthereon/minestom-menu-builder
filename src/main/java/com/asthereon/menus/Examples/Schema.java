@@ -5,6 +5,7 @@ import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -22,7 +23,7 @@ public class Schema {
                 .mask("321 333 123");
 
         // Create a MenuBuilder with 6 rows and give it a title
-        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, "Schema Example")
+        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text("Schema Example"))
                 // Set the menu to be read only (unable to be modified with click events)
                 .readOnly(true);
 

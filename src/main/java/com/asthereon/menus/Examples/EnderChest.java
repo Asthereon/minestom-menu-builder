@@ -2,6 +2,8 @@ package com.asthereon.menus.Examples;
 
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
+
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.InventoryType;
@@ -15,7 +17,7 @@ public class EnderChest {
     private static final StorageLocation storageLocation = MinecraftServer.getStorageManager().getLocation("enderChest", new StorageOptions(), new FileStorageSystem());
 
     public void open(Player player) {
-        Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, player.getUsername() + "'s Ender Chest").build();
+        Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, Component.text(player.getUsername() + "'s Ender Chest")).build();
         menu.bindToSave((serializedData) -> {
             storageLocation.set(player.getUuid().toString(), Base64.decodeBase64(serializedData));
         });
