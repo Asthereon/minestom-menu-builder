@@ -1,22 +1,23 @@
 package com.asthereon.menus.Examples;
 
+import javax.annotation.Nullable;
+
+import org.apache.commons.codec.binary.Base64;
+
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
-import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
-import com.asthereon.menus.MenuManager;
 import com.asthereon.menus.MenuSchema;
+
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.storage.StorageLocation;
 import net.minestom.server.storage.StorageOptions;
-import org.apache.commons.codec.binary.Base64;
 
 public class Bank {
 
@@ -24,11 +25,7 @@ public class Bank {
     private static final int MINIMUM_TAB_SLOT = 0;
     private static final int MAXIMUM_TAB_SLOT = 8;
 
-    public void open(Player player) {
-        open(player, null);
-    }
-
-    public void open(Player player, Data metadata) {
+    public void open(Player player, @Nullable Data metadata) {
         // Create a schema
         MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
                 .mask("RRRRRRRRR");
@@ -57,7 +54,7 @@ public class Bank {
                                     .displayName(AsthCore.getComponent("<reset><yellow>Bank Tab " + (tab + 1)))
                                     .build())
                             // Bind a Menu Consumer to the click event of this button
-                            .click((menu) -> {
+                            .click((menu, clickInfo) -> {
                                 // Cache the previous tab for saving
                                 Integer previousTab = menu.getMetadata( "bankTab",0);
                                 menu.setMetadata("previousBankTab",previousTab,Integer.class);

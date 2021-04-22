@@ -49,12 +49,13 @@ public class MenuButton {
         return this;
     }
 
-    public MenuButton click(Consumer<Menu> callback) {
+    public MenuButton click(BiConsumer<Menu,ClickInfo> callback) {
         return this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
+        	ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
             if (slots.contains(slot)) {
                 Menu menu = MenuManager.getMenu(uuid);
                 if (null != menu) {
-                    callback.accept(menu);
+                    callback.accept(menu, clickInfo);
                 }
             }
         }));

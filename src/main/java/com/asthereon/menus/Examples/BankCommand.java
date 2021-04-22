@@ -30,6 +30,6 @@ public class BankCommand extends Command {
         AsthCore.console("Test");
         Player player = (Player) sender;
 
-        new Bank().open(player);
+        new Bank().open(player, null);
     }
 }
