@@ -21,12 +21,20 @@ public class MenuButton {
     private List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();
 
-    private MenuButton() { }
+    public MenuButton() { }
 
-    public static MenuButton on(UUID menuUUID) {
-        MenuButton menuButton = new MenuButton();
-        menuButton.uuid = menuUUID;
-        return menuButton;
+    public static MenuButton from(MenuButton menuButton) {
+        MenuButton newMenuButton = new MenuButton();
+        newMenuButton.itemStack = menuButton.getItemStack();
+        newMenuButton.slots = menuButton.getSlots();
+        newMenuButton.inventoryConditions = menuButton.getInventoryConditions();
+        newMenuButton.uuid = menuButton.getUUID();
+        return newMenuButton;
+    }
+
+    public MenuButton uuid(UUID uuid) {
+        this.uuid = uuid;
+        return this;
     }
 
     public MenuButton slot(int slotID) {
@@ -51,7 +59,7 @@ public class MenuButton {
 
     public MenuButton click(BiConsumer<Menu,ClickInfo> callback) {
         return this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
-        	ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
+            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
             if (slots.contains(slot)) {
                 Menu menu = MenuManager.getMenu(uuid);
                 if (null != menu) {
@@ -86,6 +94,10 @@ public class MenuButton {
 
     public List<Integer> getSlots() {
         return slots;
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 
     public void setSlot(int slot) {

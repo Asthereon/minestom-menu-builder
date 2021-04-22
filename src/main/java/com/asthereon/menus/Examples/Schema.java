@@ -1,6 +1,8 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
+import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
+import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
@@ -30,7 +32,7 @@ public class Schema {
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
+                new MenuButton()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("0"))
                         // Create the item stack to represent this button
@@ -47,7 +49,7 @@ public class Schema {
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
+                new MenuButton()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("1"))
                         // Create the item stack to represent this button
@@ -64,7 +66,7 @@ public class Schema {
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
+                new MenuButton()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("2"))
                         // Create the item stack to represent this button
@@ -81,7 +83,7 @@ public class Schema {
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
+                new MenuButton()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("3"))
                         // Create the item stack to represent this button

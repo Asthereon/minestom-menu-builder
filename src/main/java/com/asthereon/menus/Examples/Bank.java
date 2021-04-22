@@ -1,9 +1,5 @@
 package com.asthereon.menus.Examples;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.codec.binary.Base64;
-
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
 import com.asthereon.menus.Menu;
@@ -40,33 +36,8 @@ public class Bank {
 
         // Create all 9 bank tabs
         for (int i = 0; i < 9; i++) {
-            // Final variable required for the lambdas for the click method
-            final int tab = i;
-
             // Add a button to the menu
-            menuBuilder.button(
-                    // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                    menuBuilder.createMenuButton()
-                            // Set the slot the button will go in
-                            .slot(tab)
-                            // Create the item stack to represent this button
-                            .itemStack(ItemStack.builder(Material.PAPER)
-                                    .amount(tab + 1)
-                                    .displayName(AsthCore.getComponent("<reset><yellow>Bank Tab " + (tab + 1)))
-                                    .build())
-                            // Bind a Menu Consumer to the click event of this button
-                            .click((menu, clickInfo) -> {
-                                // Cache the previous tab for saving
-                                Integer previousTab = menu.getMetadata( "bankTab",0);
-                                menu.setMetadata("previousBankTab",previousTab,Integer.class);
-                                // Set the new bank tab to this tab
-                                menu.setMetadata("bankTab",tab,Integer.class);
-                                // Mark this as a bank tab swap to correctly save the bank tab data
-                                menu.setMetadata("bankTabSwap",true,Boolean.class);
-                                // Open the new bank menu with the existing metadata
-                                new Bank().open(player, menu.getMetadata());
-                            })
-            );
+            menuBuilder.button(createBankTabButton(i));
         }
 
         // Build the menu
@@ -117,4 +88,34 @@ public class Bank {
         // Open the menu to the player
         menu.open(player);
     }
+
+    private MenuButton createBankTabButton(int tab) {
+        return MenuButton.from(BANK_TAB_BUTTON)
+                // Set the slot the button will go in
+                .slot(tab)
+                // Create the item stack to represent this button
+                .itemStack(ItemStack.builder(Material.PAPER)
+                        .amount(tab + 1)
+                        .displayName(AsthCore.getComponent("<reset><yellow>Bank Tab " + (tab + 1)))
+                        .build());
+    }
+
+    // A static MenuButton with the click logic to use as a template for the bank buttons
+    private static final MenuButton BANK_TAB_BUTTON =
+            // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
+            new MenuButton()
+                    // Bind a Menu Consumer to the click event of this button
+                    .click((menu,clickInfo) -> {
+                        // Cache the previous tab for saving
+                        Integer previousTab = menu.getMetadata( "bankTab",0);
+                        menu.setMetadata("previousBankTab",previousTab,Integer.class);
+                        // Get this tab's index
+                        int bankTab = clickInfo.getItemStack().getAmount() - 1;
+                        // Set the new bank tab to this tab
+                        menu.setMetadata("bankTab",bankTab,Integer.class);
+                        // Mark this as a bank tab swap to correctly save the bank tab data
+                        menu.setMetadata("bankTabSwap",true,Boolean.class);
+                        // Open the new bank menu with the existing metadata
+                        new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
+                    });
 }

@@ -1,8 +1,10 @@
 package com.asthereon.menus;
 
 import net.minestom.server.entity.Player;
+import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.inventory.condition.InventoryConditionResult;
+import net.minestom.server.item.ItemStack;
 
 public class ClickInfo {
 
@@ -36,5 +38,16 @@ public class ClickInfo {
 
     public InventoryConditionResult getInventoryConditionResult() {
         return inventoryConditionResult;
+    }
+
+    public ItemStack getItemStack() {
+        ItemStack itemStack = ItemStack.AIR;
+
+        Inventory inventory = player.getOpenInventory();
+        if (null != inventory) {
+            itemStack = inventory.getItemStack(slot);
+        }
+
+        return itemStack;
     }
 }
