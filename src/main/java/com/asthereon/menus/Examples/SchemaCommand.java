@@ -1,0 +1,16 @@
+package com.asthereon.menus.Examples;
+
+import com.asthereon.asthcore.AsthCore;
+import net.minestom.server.command.builder.Command;
+
+public class SchemaCommand extends Command {
+    public SchemaCommand() {
+        super("schema");
+
+        setDefaultExecutor((sender, context) -> AsthCore.sendMessage(sender, "<white>Usage: /schema"));
+
+        addSyntax((sender, context) -> {
+            new Schema().open(sender.asPlayer());
+        });
+    }
+}

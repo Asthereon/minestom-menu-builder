@@ -6,6 +6,7 @@ import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuManager;
+import com.asthereon.menus.MenuSchema;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
 import net.minestom.server.data.DataImpl;
@@ -28,10 +29,14 @@ public class Bank {
     }
 
     public void open(Player player, Data metadata) {
+        // Create a schema
+        MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
+                .mask("RRRRRRRRR");
+
         // Create a MenuBuilder with 6 rows and give it a title
         MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, player.getUsername() + "'s Bank")
                 // Set the top row of the menu to be read only (unable to be modified with click events)
-                .readOnlyRange(0,8)
+                .readOnlySlots(schema.getSlots('R'))
                 // Transfer any existing metadata from a menu refresh due to tab changes
                 .metadata(metadata);
 
