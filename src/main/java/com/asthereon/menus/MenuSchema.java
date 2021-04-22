@@ -11,7 +11,7 @@ public class MenuSchema {
 
     private int slotCount = 0;
     private int markerSlot = 0;
-    private HashMap<Character, List<Integer>> schemas = new HashMap<>();
+    private final HashMap<Character, List<Integer>> schemas = new HashMap<>();
 
     public MenuSchema(InventoryType inventoryType) {
         slotCount = inventoryType.getSize();

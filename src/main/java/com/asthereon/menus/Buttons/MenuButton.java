@@ -1,5 +1,6 @@
 package com.asthereon.menus.Buttons;
 
+import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuClickType;
 import com.asthereon.menus.MenuManager;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class MenuButton {
@@ -58,13 +60,14 @@ public class MenuButton {
         }));
     }
 
-    public MenuButton click(MenuClickType menuClickType, Consumer<Menu> callback) {
+    public MenuButton click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
         return this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
+            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
             if (slots.contains(slot)) {
-                if (menuClickType.toString().equals(clickType.toString())) {
+                if (clickInfo.isMenuClickType(menuClickType)) {
                     Menu menu = MenuManager.getMenu(uuid);
                     if (null != menu) {
-                        callback.accept(menu);
+                        callback.accept(menu,clickInfo);
                     }
                 }
             }
