@@ -18,7 +18,7 @@ public class MenuSchema {
         slotCount = inventoryType.getSize();
     }
 
-    public MenuSchema mask(String slots) {
+    private void mask(String slots) {
         // Get all the markers as a character array
         char[] markers = slots.replace(" ", "").toCharArray();
 
@@ -41,6 +41,12 @@ public class MenuSchema {
                 // Increment the marker slot
                 markerSlot++;
             }
+        }
+    }
+    
+    public MenuSchema mask(String... maskArray) {
+        for (String slots : maskArray) {
+            mask(slots);
         }
         return this;
     }
