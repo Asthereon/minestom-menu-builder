@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public class MenuButton {
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = ItemStack.AIR;
     private UUID uuid;
     private List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();

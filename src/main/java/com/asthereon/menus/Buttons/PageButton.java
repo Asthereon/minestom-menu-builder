@@ -10,7 +10,7 @@ import java.util.List;
 
 public class PageButton {
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = ItemStack.AIR;
     private List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();
     private int offset = 0;

@@ -27,6 +27,12 @@ public class Schema {
                 .mask("012 000 210")
                 .mask("321 333 123");
 
+        MenuSchema other = new MenuSchema(InventoryType.CRAFTING)
+                .mask("000")
+                .mask("111")
+                .mask("222")
+                .mask("3");
+
         // Create a MenuBuilder with 6 rows and give it a title
         MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, "Schema Example")
                 // Set the menu to be read only (unable to be modified with click events)

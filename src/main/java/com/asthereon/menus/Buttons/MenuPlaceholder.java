@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MenuPlaceholder {
 
-    private ItemStack itemStack;
+    private ItemStack itemStack = ItemStack.AIR;
     private List<Integer> slots = new ArrayList<>();
 
     public MenuPlaceholder() { }

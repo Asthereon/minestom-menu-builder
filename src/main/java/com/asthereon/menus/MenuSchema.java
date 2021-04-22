@@ -1,6 +1,5 @@
 package com.asthereon.menus;
 
-import com.asthereon.asthcore.AsthCore;
 import net.minestom.server.inventory.InventoryType;
 import org.apache.commons.lang3.StringUtils;
 
