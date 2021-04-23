@@ -4,6 +4,7 @@ import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuClickType;
 import com.asthereon.menus.MenuManager;
+import net.minestom.server.data.Data;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 
@@ -12,21 +13,33 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class MenuButton {
 
     private ItemStack itemStack = ItemStack.AIR;
     private UUID uuid;
-    private List<Integer> slots = new ArrayList<>();
+    private final List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();
+    private Data metadata;
 
-    private MenuButton() { }
+    public MenuButton() { }
 
-    public static MenuButton on(UUID menuUUID) {
-        MenuButton menuButton = new MenuButton();
-        menuButton.uuid = menuUUID;
-        return menuButton;
+    public static MenuButtonBuilder builder() {
+        return MenuButtonBuilder.builder();
+    }
+
+    public static MenuButton from(MenuButton menuButton) {
+        MenuButton newMenuButton = new MenuButton();
+        newMenuButton.itemStack = menuButton.getItemStack();
+        newMenuButton.slots.addAll(menuButton.getSlots());
+        newMenuButton.inventoryConditions = menuButton.getInventoryConditions();
+        newMenuButton.uuid = menuButton.getUUID();
+        return newMenuButton;
+    }
+
+    public MenuButton uuid(UUID uuid) {
+        this.uuid = uuid;
+        return this;
     }
 
     public MenuButton slot(int slotID) {
@@ -44,31 +57,23 @@ public class MenuButton {
         return this;
     }
 
-    public MenuButton inventoryCondition(InventoryCondition inventoryCondition) {
-        this.inventoryConditions.add(inventoryCondition);
+    public MenuButton metadata(Data metadata) {
+        this.metadata = metadata;
         return this;
     }
 
-    public MenuButton click(BiConsumer<Menu,ClickInfo> callback) {
-        return this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
-        	ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
-            if (slots.contains(slot)) {
-                Menu menu = MenuManager.getMenu(uuid);
-                if (null != menu) {
-                    callback.accept(menu, clickInfo);
-                }
-            }
-        }));
+    public void inventoryCondition(InventoryCondition inventoryCondition) {
+        this.inventoryConditions.add(inventoryCondition);
     }
 
-    public MenuButton click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
-        return this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
-            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
+    public void click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
+        this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
+            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult, metadata);
             if (slots.contains(slot)) {
                 if (clickInfo.isMenuClickType(menuClickType)) {
                     Menu menu = MenuManager.getMenu(uuid);
                     if (null != menu) {
-                        callback.accept(menu,clickInfo);
+                        callback.accept(menu, clickInfo);
                     }
                 }
             }
@@ -88,9 +93,14 @@ public class MenuButton {
         return slots;
     }
 
-    public void setSlot(int slot) {
+    public UUID getUUID() {
+        return uuid;
+    }
+
+    public MenuButton setSlot(int slot) {
         this.slots.clear();
         this.slots.add(slot);
+        return this;
     }
 
     public List<InventoryCondition> getInventoryConditions() {

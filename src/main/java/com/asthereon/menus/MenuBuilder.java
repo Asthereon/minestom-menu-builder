@@ -24,7 +24,7 @@ public class MenuBuilder {
     private HashMap<String, MenuSection> sections = new HashMap<>();
     private Data metadata = new DataImpl();
 
-    public MenuBuilder(InventoryType inventoryType, Component title) {
+    private MenuBuilder(InventoryType inventoryType, Component title) {
         this.inventory = new MenuInventory(inventoryType, title);
         this.uuid = UUID.randomUUID();
     }
@@ -136,7 +136,8 @@ public class MenuBuilder {
     }
 
     public MenuBuilder button(MenuButton menuButton) {
-        buttons.add(menuButton);
+        // Set the UUID of the menu on the button, then add it to the buttons list
+        buttons.add(menuButton.uuid(uuid));
         return this;
     }
 
@@ -153,10 +154,6 @@ public class MenuBuilder {
     public MenuBuilder storageData(String storageData) {
         this.storageData = storageData;
         return this;
-    }
-
-    public MenuButton createMenuButton() {
-        return MenuButton.on(uuid);
     }
 
     public Menu build() {

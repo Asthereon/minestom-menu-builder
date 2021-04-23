@@ -1,10 +1,12 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
+import com.asthereon.menus.Buttons.MenuButton;
+import com.asthereon.menus.Buttons.MenuButtonBuilder;
+import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
-
 import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -12,90 +14,60 @@ import net.minestom.server.item.Material;
 
 public class Schema {
 
-    public static Menu get() {
-        // Create a schema (spaces are removed and ignored, so they're allowed for easier readability)
-        MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
-                .mask("000 111 000")
-                .mask("020 222 020")
-                .mask("000 111 000")
-                .mask("333 333 333")
-                .mask("012 000 210")
-                .mask("321 333 123");
+    // Create a schema (spaces are removed and ignored, so they're allowed for easier readability)
+    private static final MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
+            .mask("000 111 000")
+            .mask("020 222 020")
+            .mask("000 111 000")
+            .mask("333 333 333")
+            .mask("012 000 210")
+            .mask("321 333 123");
 
+    public static Menu get() {
         // Create a MenuBuilder with 6 rows and give it a title
         MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text("Schema Example"))
                 // Set the menu to be read only (unable to be modified with click events)
                 .readOnly(true);
 
-        // Add a button to the menu
-        menuBuilder.button(
-                // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
-                        // Set the slots the button will go in by pulling the slots for character "0" in the schema
-                        .slots(schema.getSlots("0"))
-                        // Create the item stack to represent this button
-                        .itemStack(ItemStack.builder(Material.COAL)
-                                .amount(1)
-                                .displayName(AsthCore.getComponent("Schema Button 0"))
-                                .build())
-                        // Bind a Menu Consumer to the click event of this button
-                        .click((menu, clickInfo) -> {
-                            AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 0");
-                        })
-        );
-
-        // Add a button to the menu
-        menuBuilder.button(
-                // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
-                        // Set the slots the button will go in by pulling the slots for character "0" in the schema
-                        .slots(schema.getSlots("1"))
-                        // Create the item stack to represent this button
-                        .itemStack(ItemStack.builder(Material.IRON_INGOT)
-                                .amount(1)
-                                .displayName(AsthCore.getComponent("Schema Button 1"))
-                                .build())
-                        // Bind a Menu Consumer to the click event of this button
-                        .click((menu, clickInfo) -> {
-                            AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 1");
-                        })
-        );
-
-        // Add a button to the menu
-        menuBuilder.button(
-                // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
-                        // Set the slots the button will go in by pulling the slots for character "0" in the schema
-                        .slots(schema.getSlots("2"))
-                        // Create the item stack to represent this button
-                        .itemStack(ItemStack.builder(Material.GOLD_INGOT)
-                                .amount(1)
-                                .displayName(AsthCore.getComponent("Schema Button 2"))
-                                .build())
-                        // Bind a Menu Consumer to the click event of this button
-                        .click((menu, clickInfo) -> {
-                            AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 2");
-                        })
-        );
-
-        // Add a button to the menu
-        menuBuilder.button(
-                // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                menuBuilder.createMenuButton()
-                        // Set the slots the button will go in by pulling the slots for character "0" in the schema
-                        .slots(schema.getSlots("3"))
-                        // Create the item stack to represent this button
-                        .itemStack(ItemStack.builder(Material.DIAMOND)
-                                .amount(1)
-                                .displayName(AsthCore.getComponent("Schema Button 3"))
-                                .build())
-                        // Bind a Menu Consumer to the click event of this button
-                        .click((menu, clickInfo) -> {
-                            AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 3");
-                        })
-        );
+        // Add the button to the menu
+        menuBuilder.button(createSchemaButton(0));
+        menuBuilder.button(createSchemaButton(1));
+        menuBuilder.button(createSchemaButton(2));
+        menuBuilder.button(createSchemaButton(3));
 
         // Build the menu
         return menuBuilder.build();
+    }
+
+    // Creates the MenuButton for a specific schema ID
+    private static MenuButton createSchemaButton(int schemaID) {
+        // Get the correct material to make the button
+        Material material = Material.AIR;
+        switch (schemaID) {
+            case 0: material = Material.COAL; break;
+            case 1: material = Material.IRON_INGOT; break;
+            case 2: material = Material.GOLD_INGOT; break;
+            case 3: material = Material.DIAMOND; break;
+        }
+
+        // Build the menu button
+        return MenuButtonBuilder.from(SCHEMA_BUTTON)
+                // Set the slots the button will go in by pulling the slots for character "0" in the schema
+                .slots(schema.getSlots(Integer.toString(schemaID)))
+                // Set the metadata for the click method
+                .metadata("schemaButtonID", schemaID)
+                // Create the item stack to represent this button
+                .itemStack(ItemStack.builder(material)
+                        .displayName(AsthCore.getComponent("Schema Button " + schemaID))
+                        .build())
+                .build();
+    }
+
+    // A static MenuButtonBuilder with the click logic to use as a template for the schema buttons
+    private static final MenuButtonBuilder SCHEMA_BUTTON = MenuButton.builder().click(Schema::schemaButtonClick);
+
+    // A simple click function that shows ClickInfo metadata functionality
+    private static void schemaButtonClick(Menu menu, ClickInfo clickInfo) {
+        AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button " + clickInfo.getMetadata("schemaButtonID", 0));
     }
 }

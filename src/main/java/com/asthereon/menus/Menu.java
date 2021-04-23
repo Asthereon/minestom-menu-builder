@@ -6,7 +6,6 @@ import com.asthereon.menus.Buttons.PageButton;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.condition.InventoryCondition;
