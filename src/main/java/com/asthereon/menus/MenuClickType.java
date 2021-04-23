@@ -1,6 +1,7 @@
 package com.asthereon.menus;
 
 public enum MenuClickType {
+    ALL,
     LEFT_CLICK,
     RIGHT_CLICK,
     CHANGE_HELD,

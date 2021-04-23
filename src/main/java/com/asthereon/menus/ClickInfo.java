@@ -21,7 +21,7 @@ public class ClickInfo {
     }
 
     public boolean isMenuClickType(MenuClickType menuClickType) {
-        return menuClickType.toString().equals(clickType.toString());
+        return menuClickType.equals(MenuClickType.ALL) || menuClickType.toString().equals(clickType.toString());
     }
 
     public Player getPlayer() {

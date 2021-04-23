@@ -27,7 +27,6 @@ public class BankCommand extends Command {
             return;
         }
 
-        AsthCore.console("Test");
         Player player = (Player) sender;
 
         new Bank().open(player, null);

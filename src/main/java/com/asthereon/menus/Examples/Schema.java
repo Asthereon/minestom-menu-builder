@@ -1,12 +1,10 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
-import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
-
 import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -32,7 +30,7 @@ public class Schema {
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                new MenuButton()
+                MenuButton.builder()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("0"))
                         // Create the item stack to represent this button
@@ -41,15 +39,17 @@ public class Schema {
                                 .displayName(AsthCore.getComponent("Schema Button 0"))
                                 .build())
                         // Bind a Menu Consumer to the click event of this button
+                        // TODO: 4/22/2021 See if it's possible to add metadata to the clickInfo to be used in the click method for better re-usability
                         .click((menu, clickInfo) -> {
                             AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 0");
                         })
+                        .build()
         );
 
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                new MenuButton()
+                MenuButton.builder()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("1"))
                         // Create the item stack to represent this button
@@ -61,12 +61,13 @@ public class Schema {
                         .click((menu, clickInfo) -> {
                             AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 1");
                         })
+                        .build()
         );
 
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                new MenuButton()
+                MenuButton.builder()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("2"))
                         // Create the item stack to represent this button
@@ -78,12 +79,13 @@ public class Schema {
                         .click((menu, clickInfo) -> {
                             AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 2");
                         })
+                        .build()
         );
 
         // Add a button to the menu
         menuBuilder.button(
                 // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-                new MenuButton()
+                MenuButton.builder()
                         // Set the slots the button will go in by pulling the slots for character "0" in the schema
                         .slots(schema.getSlots("3"))
                         // Create the item stack to represent this button
@@ -95,6 +97,7 @@ public class Schema {
                         .click((menu, clickInfo) -> {
                             AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button 3");
                         })
+                        .build()
         );
 
         // Build the menu

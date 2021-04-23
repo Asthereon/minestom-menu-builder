@@ -2,10 +2,12 @@ package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
+import com.asthereon.menus.Buttons.MenuButton;
+import com.asthereon.menus.Buttons.MenuButtonBuilder;
+import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuBuilder;
 import com.asthereon.menus.MenuSchema;
-
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
@@ -15,6 +17,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.storage.StorageLocation;
 import net.minestom.server.storage.StorageOptions;
+import org.apache.commons.codec.binary.Base64;
+
+import javax.annotation.Nullable;
 
 public class Bank {
 
@@ -36,7 +41,7 @@ public class Bank {
 
         // Create all 9 bank tabs
         for (int i = 0; i < 9; i++) {
-            // Add a button to the menu
+            // Create and add the bank tab button to the menu
             menuBuilder.button(createBankTabButton(i));
         }
 
@@ -62,7 +67,7 @@ public class Bank {
             }
             // IF the tab is in the correct range
             if (tab >= MINIMUM_TAB_SLOT && tab <= MAXIMUM_TAB_SLOT) {
-                // Save the tab data to the storage location (this should ideally be cached in memory to avoid latency desync)
+                // Save the tab data to the storage location (this should ideally be cached in memory to avoid latency de-sync)
                 storageLocation.set("tab" + tab + "-" + player.getUuid().toString(), Base64.decodeBase64(serializedData));
 
                 // Clear the bank tab swapping to ensure that the menu closing normally will save correctly if the next event is a normal menu close
@@ -89,33 +94,43 @@ public class Bank {
         menu.open(player);
     }
 
+    // Creates a bank tab button by using the BANK_TAB_BUTTON to apply click functionality, while retaining the ability
+    //  to change the slot and item stack of each tab
     private MenuButton createBankTabButton(int tab) {
-        return MenuButton.from(BANK_TAB_BUTTON)
-                // Set the slot the button will go in
-                .slot(tab)
-                // Create the item stack to represent this button
-                .itemStack(ItemStack.builder(Material.PAPER)
-                        .amount(tab + 1)
-                        .displayName(AsthCore.getComponent("<reset><yellow>Bank Tab " + (tab + 1)))
-                        .build());
+        return MenuButtonBuilder.from(BANK_TAB_BUTTON)
+                // Set the slot the button will go in (using setSlot to ensure it overwrites previous slots)
+                .setSlot(tab)
+                // Set the amount of the item stack
+                .amount(tab + 1)
+                // Set the display name of the item stack
+                .displayName(AsthCore.getComponent("<reset><yellow>Bank Tab " + (tab + 1)))
+                // Build the menu button
+                .build();
     }
 
-    // A static MenuButton with the click logic to use as a template for the bank buttons
-    private static final MenuButton BANK_TAB_BUTTON =
+    // A static MenuButtonBuilder with the click logic to use as a template for the bank tab buttons
+    private static final MenuButtonBuilder BANK_TAB_BUTTON =
             // Creates a menu button using the menu's UUID behind the scenes to create a lazy binding for the Menu to pass to the click Consumer
-            new MenuButton()
+            MenuButton.builder()
+                    // Create the item stack to represent this button
+                    .itemStack(ItemStack.builder(Material.PAPER)
+                            .lore(AsthCore.getComponent("<reset><green>Click to open this tab"))
+                            .build())
                     // Bind a Menu Consumer to the click event of this button
-                    .click((menu,clickInfo) -> {
-                        // Cache the previous tab for saving
-                        Integer previousTab = menu.getMetadata( "bankTab",0);
-                        menu.setMetadata("previousBankTab",previousTab,Integer.class);
-                        // Get this tab's index
-                        int bankTab = clickInfo.getItemStack().getAmount() - 1;
-                        // Set the new bank tab to this tab
-                        menu.setMetadata("bankTab",bankTab,Integer.class);
-                        // Mark this as a bank tab swap to correctly save the bank tab data
-                        menu.setMetadata("bankTabSwap",true,Boolean.class);
-                        // Open the new bank menu with the existing metadata
-                        new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
-                    });
+                    .click(Bank::switchTab);
+
+    // Click functionality for bank tabs
+    private static void switchTab(Menu menu, ClickInfo clickInfo) {
+        // Cache the previous tab for saving
+        Integer previousTab = menu.getMetadata( "bankTab",0);
+        menu.setMetadata("previousBankTab",previousTab,Integer.class);
+        // Get this tab's index
+        int bankTab = clickInfo.getItemStack().getAmount() - 1;
+        // Set the new bank tab to this tab
+        menu.setMetadata("bankTab",bankTab,Integer.class);
+        // Mark this as a bank tab swap to correctly save the bank tab data
+        menu.setMetadata("bankTabSwap",true,Boolean.class);
+        // Open the new bank menu with the existing metadata
+        new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
+    }
 }

@@ -24,7 +24,7 @@ public class MenuBuilder {
     private HashMap<String, MenuSection> sections = new HashMap<>();
     private Data metadata = new DataImpl();
 
-    public MenuBuilder(InventoryType inventoryType, Component title) {
+    private MenuBuilder(InventoryType inventoryType, Component title) {
         this.inventory = new MenuInventory(inventoryType, title);
         this.uuid = UUID.randomUUID();
     }
