@@ -4,7 +4,10 @@ import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuClickType;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.data.Data;
+import net.minestom.server.data.DataImpl;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -15,6 +18,7 @@ public class MenuButtonBuilder {
     private UUID uuid;
     private final List<Integer> slots = new ArrayList<>();
     private HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> inventoryConditions = new HashMap<>();
+    private final Data metadata = new DataImpl();
 
     private MenuButtonBuilder() { }
 
@@ -100,9 +104,14 @@ public class MenuButtonBuilder {
         return inventoryConditions;
     }
 
+    public <T> MenuButtonBuilder metadata(String key, T value, Class<T> type) { metadata.set(key, value, type); return this; }
+
+    public <T> MenuButtonBuilder metadata(String key, T value) { metadata.set(key, value); return this; }
+
     public MenuButton build() {
         MenuButton menuButton = new MenuButton()
                 .slots(slots)
+                .metadata(metadata)
                 .itemStack(itemStack);
 
         inventoryConditions.forEach((menuButton::click));

@@ -4,6 +4,7 @@ import com.asthereon.menus.ClickInfo;
 import com.asthereon.menus.Menu;
 import com.asthereon.menus.MenuClickType;
 import com.asthereon.menus.MenuManager;
+import net.minestom.server.data.Data;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 
@@ -19,6 +20,7 @@ public class MenuButton {
     private UUID uuid;
     private final List<Integer> slots = new ArrayList<>();
     private List<InventoryCondition> inventoryConditions = new ArrayList<>();
+    private Data metadata;
 
     public MenuButton() { }
 
@@ -55,13 +57,18 @@ public class MenuButton {
         return this;
     }
 
+    public MenuButton metadata(Data metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
     public void inventoryCondition(InventoryCondition inventoryCondition) {
         this.inventoryConditions.add(inventoryCondition);
     }
 
     public void click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
         this.inventoryCondition(((player, slot, clickType, inventoryConditionResult) -> {
-            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult);
+            ClickInfo clickInfo = new ClickInfo(player, slot, clickType, inventoryConditionResult, metadata);
             if (slots.contains(slot)) {
                 if (clickInfo.isMenuClickType(menuClickType)) {
                     Menu menu = MenuManager.getMenu(uuid);
