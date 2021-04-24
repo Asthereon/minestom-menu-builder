@@ -13,19 +13,20 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.time.TimeUnit;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Menu {
 
     private MenuInventory inventory;
     private final UUID uuid;
-    private InventoryCondition readOnly;
-    private List<MenuButton> buttons;
-    private List<MenuPlaceholder> menuPlaceholders;
-    private HashMap<String, MenuSection> sections;
-    private List<Consumer<String>> onSave = new ArrayList<>();
-    private List<Consumer<Player>> onLoad = new ArrayList<>();
-    private Data metadata;
+    private final InventoryCondition readOnly;
+    private final List<MenuButton> buttons;
+    private final List<MenuPlaceholder> menuPlaceholders;
+    private final HashMap<String, MenuSection> sections;
+    private final List<BiConsumer<MenuView, String>> onSave = new ArrayList<>();
+    private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
+    private final Data metadata;
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
     // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
@@ -36,9 +37,7 @@ public class Menu {
         this.readOnly = readOnly;
         this.buttons = buttons;
         this.sections = sections;
-        this.sections.forEach((name,section) -> {
-            section.setMenu(this.getUuid());
-        });
+        this.sections.forEach((name,section) -> section.setMenu(this.getUuid()));
         this.menuPlaceholders = menuPlaceholders;
         MinecraftServer.getSchedulerManager().buildTask(() -> {
             if (storageData != null) {
@@ -144,7 +143,7 @@ public class Menu {
             if (openInventory.getTitle().equals(inventory.getTitle())) {
                 if (inventory.hasPersistentData()) {
                     serializedData = inventory.serialize();
-                    save(serializedData);
+                    save(player, serializedData);
                 }
                 player.closeInventory();
             }
@@ -152,23 +151,25 @@ public class Menu {
         return serializedData;
     }
 
-    public void bindToSave(Consumer<String> saveFunction) {
+    public void bindToSave(BiConsumer<MenuView, String> saveFunction) {
         onSave.add(saveFunction);
     }
 
-    private void save(String serializedData) {
-        for (Consumer<String> saveFunction : onSave) {
-            saveFunction.accept(serializedData);
+    private void save(Player player, String serializedData) {
+        MenuView menuView = new MenuView(this, player);
+        for (BiConsumer<MenuView, String> saveFunction : onSave) {
+            saveFunction.accept(menuView, serializedData);
         }
     }
 
-    public void bindToLoad(Consumer<Player> loadFunction) {
+    public void bindToLoad(Consumer<MenuView> loadFunction) {
         onLoad.add(loadFunction);
     }
 
     private void load(Player player) {
-        for (Consumer<Player> loadFunction : onLoad) {
-            loadFunction.accept(player);
+        MenuView menuView = new MenuView(this, player);
+        for (Consumer<MenuView> loadFunction : onLoad) {
+            loadFunction.accept(menuView);
         }
     }
 
@@ -184,7 +185,7 @@ public class Menu {
         String serializedData = null;
         if (inventory.hasPersistentData()) {
             serializedData = inventory.serialize();
-            save(serializedData);
+            save(player, serializedData);
         }
         return serializedData;
     }

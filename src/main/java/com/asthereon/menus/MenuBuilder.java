@@ -17,11 +17,11 @@ public class MenuBuilder {
     private final MenuInventory inventory;
     private String storageData = null;
     private boolean readOnly = false;
-    private UUID uuid;
-    private List<Integer> readOnlySlots = new ArrayList<>();
-    private List<MenuButton> buttons = new ArrayList<>();
-    private List<MenuPlaceholder> menuPlaceholders = new ArrayList<>();
-    private HashMap<String, MenuSection> sections = new HashMap<>();
+    private final UUID uuid;
+    private final List<Integer> readOnlySlots = new ArrayList<>();
+    private final List<MenuButton> buttons = new ArrayList<>();
+    private final List<MenuPlaceholder> menuPlaceholders = new ArrayList<>();
+    private final HashMap<String, MenuSection> sections = new HashMap<>();
     private Data metadata = new DataImpl();
 
     private MenuBuilder(InventoryType inventoryType, Component title) {
@@ -160,9 +160,7 @@ public class MenuBuilder {
         InventoryCondition readOnlyCondition = null;
 
         if (readOnly) {
-            readOnlyCondition = (player, slot, clickType, inventoryConditionResult) -> {
-                inventoryConditionResult.setCancel(true);
-            };
+            readOnlyCondition = (player, slot, clickType, inventoryConditionResult) -> inventoryConditionResult.setCancel(true);
         } else {
             if (readOnlySlots.size() > 0) {
                 readOnlyCondition = (player, slot, clickType, inventoryConditionResult) -> {

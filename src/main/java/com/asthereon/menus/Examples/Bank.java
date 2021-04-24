@@ -2,12 +2,9 @@ package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
+import com.asthereon.menus.*;
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuButtonBuilder;
-import com.asthereon.menus.ClickInfo;
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuBuilder;
-import com.asthereon.menus.MenuSchema;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
@@ -56,39 +53,10 @@ public class Bank {
         }
 
         // Bind the data saving code to the onSave() event
-        menu.bindToSave((serializedData) -> {
-            // Tab swapping saves the previous tab, whereas menu closing normally will save the current bank tab
-            Boolean isTabSwap = menu.getMetadata("bankTabSwap", false);
-            Integer tab;
-            if (isTabSwap) {
-                tab = menu.getMetadata("previousBankTab", -1);
-            } else {
-                tab = menu.getMetadata("bankTab", -1);
-            }
-            // IF the tab is in the correct range
-            if (tab >= MINIMUM_TAB_SLOT && tab <= MAXIMUM_TAB_SLOT) {
-                // Save the tab data to the storage location (this should ideally be cached in memory to avoid latency de-sync)
-                storageLocation.set("tab" + tab + "-" + player.getUuid().toString(), Base64.decodeBase64(serializedData));
-
-                // Clear the bank tab swapping to ensure that the menu closing normally will save correctly if the next event is a normal menu close
-                menu.setMetadata("bankTabSwap",null);
-            }
-        });
+        menu.bindToSave(Bank::save);
 
         // Bind the data loading code to the onLoad() event
-        menu.bindToLoad((player1) -> {
-            // Get the bank tab that is currently selected
-            Integer tab = menu.getMetadata("bankTab",0);
-
-            // IF the tab is in the correct range
-            if (tab >= MINIMUM_TAB_SLOT && tab <= MAXIMUM_TAB_SLOT) {
-                // Load the tab data from the storage location (could be stored somewhere other than memory, but will block so memory is best)
-                String storageData = Base64.encodeBase64String(storageLocation.get("tab" + tab + "-" + player.getUuid().toString()));
-
-                // Deserialize the tab data to populate the menu
-                menu.getInventory().deserialize(storageData);
-            }
-        });
+        menu.bindToLoad(Bank::load);
 
         // Open the menu to the player
         menu.open(player);
@@ -132,5 +100,40 @@ public class Bank {
         menu.setMetadata("bankTabSwap",true,Boolean.class);
         // Open the new bank menu with the existing metadata
         new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
+    }
+
+    // Save functionality
+    private static void save(MenuView menuView, String serializedData) {
+        // Tab swapping saves the previous tab, whereas menu closing normally will save the current bank tab
+        Boolean isTabSwap = menuView.getMetadata("bankTabSwap", false);
+        Integer tab;
+        if (isTabSwap) {
+            tab = menuView.getMetadata("previousBankTab", -1);
+        } else {
+            tab = menuView.getMetadata("bankTab", -1);
+        }
+        // IF the tab is in the correct range
+        if (tab >= MINIMUM_TAB_SLOT && tab <= MAXIMUM_TAB_SLOT) {
+            // Save the tab data to the storage location (this should ideally be cached in memory to avoid latency de-sync)
+            storageLocation.set("tab" + tab + "-" + menuView.getPlayer().getUuid().toString(), Base64.decodeBase64(serializedData));
+
+            // Clear the bank tab swapping to ensure that the menu closing normally will save correctly if the next event is a normal menu close
+            menuView.setMetadata("bankTabSwap",null);
+        }
+    }
+
+    // Load functionality
+    private static void load(MenuView menuView) {
+        // Get the bank tab that is currently selected
+        Integer tab = menuView.getMetadata("bankTab",0);
+
+        // IF the tab is in the correct range
+        if (tab >= MINIMUM_TAB_SLOT && tab <= MAXIMUM_TAB_SLOT) {
+            // Load the tab data from the storage location (could be stored somewhere other than memory, but will block so memory is best)
+            String storageData = Base64.encodeBase64String(storageLocation.get("tab" + tab + "-" + menuView.getPlayer().getUuid().toString()));
+
+            // Deserialize the tab data to populate the menu
+            menuView.getMenu().getInventory().deserialize(storageData);
+        }
     }
 }
