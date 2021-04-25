@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import com.asthereon.asthcore.Interfaces.Serializable;
 import net.kyori.adventure.text.Component;

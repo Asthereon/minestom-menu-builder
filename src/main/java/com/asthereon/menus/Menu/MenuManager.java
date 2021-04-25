@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MenuManager {
 
     // Instance
-    private static MenuManager instance = new MenuManager();
+    private static final MenuManager instance = new MenuManager();
 
     // Variables
     public static HashMap<UUID, Menu> menus = new HashMap<>();
@@ -43,15 +43,22 @@ public class MenuManager {
     public static void closeInventoryEvent(Player player, Inventory inventory) {
         if (inventory != null) {
             if (MenuManager.getInstance().isMenu(player,inventory.getTitle())) {
-                //System.out.println("MENU CLOSED");
                 Menu menu = MenuManager.getInstance().getMenu(player);
                 if (null != menu) {
-                    String serializedData = menu.closeEvent(player);
-                    //System.out.println("CLOSE EVENT: "+serializedData);
+                    // Menu inventory closed, handle the menu cursor
+                    CursorOverflow.handleCursorItem(player, CursorOverflow.getDefaultMenuOverflowType());
+                    menu.closeEvent(player);
+                } else {
+                    // Non-menu inventory closed, handle the inventory cursor
+                    CursorOverflow.handleCursorItem(player, CursorOverflow.getDefaultInventoryOverflowType());
                 }
             } else {
-                //System.out.println("NON-MENU CLOSED");
+                // Non-menu inventory closed, handle the inventory cursor
+                CursorOverflow.handleCursorItem(player, CursorOverflow.getDefaultInventoryOverflowType());
             }
+        } else {
+            // Player inventory closed, handle the player inventory cursor
+            CursorOverflow.handleCursorItem(player, CursorOverflow.getDefaultPlayerInventoryOverflowType());
         }
     }
 

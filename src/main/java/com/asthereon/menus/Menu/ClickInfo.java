@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import net.minestom.server.data.Data;
 import net.minestom.server.entity.Player;

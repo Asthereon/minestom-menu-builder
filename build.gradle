@@ -25,8 +25,8 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.Minestom:Minestom:1daaeda63f'
-    implementation 'com.github.Asthereon:minestom-asthcore:0c0795f67d'
+    compile 'com.github.Minestom:Minestom:db619243da'
+    implementation 'com.github.Asthereon:minestom-asthcore:61eb1f807e'
 }
 
 jar {

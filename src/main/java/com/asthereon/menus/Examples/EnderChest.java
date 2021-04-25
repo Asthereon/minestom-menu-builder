@@ -1,8 +1,9 @@
 package com.asthereon.menus.Examples;
 
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuBuilder;
+import com.asthereon.menus.Menu.Menu;
+import com.asthereon.menus.Menu.MenuBuilder;
 
+import com.asthereon.menus.Menu.MenuView;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
@@ -18,14 +19,18 @@ public class EnderChest {
 
     public void open(Player player) {
         Menu menu = MenuBuilder.of(InventoryType.CHEST_3_ROW, Component.text(player.getUsername() + "'s Ender Chest")).build();
-        menu.bindToSave((serializedData) -> {
-            storageLocation.set(player.getUuid().toString(), Base64.decodeBase64(serializedData));
-        });
-        menu.bindToLoad((player1) -> {
-            String storageData = Base64.encodeBase64String(storageLocation.get(player.getUuid().toString()));
-            menu.getInventory().deserialize(storageData);
-        });
+        menu.bindToSave(EnderChest::save);
+        menu.bindToLoad(EnderChest::load);
         menu.open(player);
+    }
+
+    private static void save(MenuView menuView, String serializedData) {
+        storageLocation.set(menuView.getPlayer().getUuid().toString(), Base64.decodeBase64(serializedData));
+    }
+
+    private static void load(MenuView menuView) {
+        String storageData = Base64.encodeBase64String(storageLocation.get(menuView.getPlayer().getUuid().toString()));
+        menuView.getMenu().getInventory().deserialize(storageData);
     }
 
 }

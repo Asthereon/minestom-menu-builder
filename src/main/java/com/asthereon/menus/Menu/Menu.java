@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuPlaceholder;
@@ -26,6 +26,8 @@ public class Menu {
     private final HashMap<String, MenuSection> sections;
     private final List<BiConsumer<MenuView, String>> onSave = new ArrayList<>();
     private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
+    private BiConsumer<MenuView, ItemStack> menuCursorItemOverflow = null;
+    private BiConsumer<Player, ItemStack> defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(CursorOverflowType.DEFAULT);
     private final Data metadata;
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
@@ -171,6 +173,34 @@ public class Menu {
         for (Consumer<MenuView> loadFunction : onLoad) {
             loadFunction.accept(menuView);
         }
+    }
+
+    // Sets the cursor item overflow handler to be menu specific
+    public void bindToCursorItemOverflow(BiConsumer<MenuView, ItemStack> cursorItemOverflowFunction) {
+        defaultCursorItemOverflow = null;
+        menuCursorItemOverflow = cursorItemOverflowFunction;
+    }
+
+    // Sets the cursor item overflow handler to be a generic type that can't access menu specific data
+    public void bindToCursorItemOverflow(CursorOverflowType cursorOverflowType) {
+        menuCursorItemOverflow = null;
+        defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(cursorOverflowType);
+    }
+
+    protected boolean isMenuCursorItemOverflow() {
+        return menuCursorItemOverflow != null;
+    }
+
+    protected boolean isDefaultCursorItemOverflow() {
+        return defaultCursorItemOverflow != null;
+    }
+
+    protected BiConsumer<MenuView, ItemStack> getMenuCursorItemOverflow() {
+        return menuCursorItemOverflow;
+    }
+
+    protected BiConsumer<Player, ItemStack> getDefaultCursorItemOverflow() {
+        return defaultCursorItemOverflow;
     }
 
     public Component getTitle() {

@@ -1,6 +1,6 @@
 package com.asthereon.menus.Buttons;
 
-import com.asthereon.menus.MenuClickType;
+import com.asthereon.menus.Menu.MenuClickType;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 

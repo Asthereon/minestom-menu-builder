@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.PageButton;
@@ -11,12 +11,12 @@ import java.util.UUID;
 
 public class MenuSection {
 
-    private String name;
+    private final String name;
     private UUID menuID;
-    private List<Integer> slots = new ArrayList<>();
-    private List<MenuButton> buttons = new ArrayList<>();
-    private List<PageButton> pageButtons = new ArrayList<>();
-    private List<Integer> pageButtonSlots = new ArrayList<>();
+    private final List<Integer> slots = new ArrayList<>();
+    private final List<MenuButton> buttons = new ArrayList<>();
+    private final List<PageButton> pageButtons = new ArrayList<>();
+    private final List<Integer> pageButtonSlots = new ArrayList<>();
     private int offset = 0;
     private int minimumVisible = 1;
 
@@ -76,9 +76,7 @@ public class MenuSection {
                 .slot(slot)
                 .itemStack(itemStack)
                 .offset(offset)
-                .click(() -> {
-                    setOffset(this.offset + offset);
-                })
+                .click(() -> setOffset(this.offset + offset))
         );
         return this;
     }

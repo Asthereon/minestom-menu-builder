@@ -2,9 +2,9 @@ package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.StorageSystem.JsonFileStorage;
-import com.asthereon.menus.*;
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuButtonBuilder;
+import com.asthereon.menus.Menu.*;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
@@ -30,7 +30,7 @@ public class Bank {
                 .mask("RRRRRRRRR");
 
         // Create a MenuBuilder with 6 rows and give it a title
-        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text(player.getUsername() + "'s Bank"))
+        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text(player.getUsername() + "'s Bank (Tab " + (metadata == null ? "1" : metadata.getOrDefault("bankTab", 0) + 1) + ")"))
                 // Set the top row of the menu to be read only (unable to be modified with click events)
                 .readOnlySlots(schema.getSlots('R'))
                 // Transfer any existing metadata from a menu refresh due to tab changes
@@ -57,6 +57,9 @@ public class Bank {
 
         // Bind the data loading code to the onLoad() event
         menu.bindToLoad(Bank::load);
+
+        // Set up how this menu handles cursor items that won't fit in the player's inventory on menu close
+        menu.bindToCursorItemOverflow(Bank::cursorItemOverflow);
 
         // Open the menu to the player
         menu.open(player);
@@ -89,17 +92,21 @@ public class Bank {
 
     // Click functionality for bank tabs
     private static void switchTab(Menu menu, ClickInfo clickInfo) {
-        // Cache the previous tab for saving
-        Integer previousTab = menu.getMetadata( "bankTab",0);
-        menu.setMetadata("previousBankTab",previousTab,Integer.class);
         // Get this tab's index
         int bankTab = clickInfo.getItemStack().getAmount() - 1;
-        // Set the new bank tab to this tab
-        menu.setMetadata("bankTab",bankTab,Integer.class);
-        // Mark this as a bank tab swap to correctly save the bank tab data
-        menu.setMetadata("bankTabSwap",true,Boolean.class);
-        // Open the new bank menu with the existing metadata
-        new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
+
+        // Only process click if it's a different tab
+        if (bankTab != menu.getMetadata("bankTab",0)) {
+            // Cache the previous tab for saving
+            Integer previousTab = menu.getMetadata("bankTab", 0);
+            menu.setMetadata("previousBankTab", previousTab, Integer.class);
+            // Set the new bank tab to this tab
+            menu.setMetadata("bankTab", bankTab, Integer.class);
+            // Mark this as a bank tab swap to correctly save the bank tab data
+            menu.setMetadata("bankTabSwap", true, Boolean.class);
+            // Open the new bank menu with the existing metadata
+            new Bank().open(clickInfo.getPlayer(), menu.getMetadata());
+        }
     }
 
     // Save functionality
@@ -134,6 +141,15 @@ public class Bank {
 
             // Deserialize the tab data to populate the menu
             menuView.getMenu().getInventory().deserialize(storageData);
+        }
+    }
+
+    // Cursor item handling functionality
+    private static void cursorItemOverflow(MenuView menuView, ItemStack itemStack) {
+        // IF the item stack can't be put into the bank storage
+        if (!menuView.getMenu().getInventory().addItemStack(itemStack)) {
+            // Default to dropping the item stack on the ground using the default cursor overflow drop type
+            CursorOverflow.getCursorOverflowHandler(CursorOverflowType.DROP).accept(menuView.getPlayer(), itemStack);
         }
     }
 }

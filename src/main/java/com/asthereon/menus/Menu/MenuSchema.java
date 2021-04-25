@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import net.minestom.server.inventory.InventoryType;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MenuSchema {
 
-    private int slotCount = 0;
+    private int slotCount;
     private int markerSlot = 0;
     private final HashMap<Character, List<Integer>> schemas = new HashMap<>();
 

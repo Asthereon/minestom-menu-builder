@@ -3,10 +3,7 @@ package com.asthereon.menus.Examples;
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuButtonBuilder;
-import com.asthereon.menus.ClickInfo;
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuBuilder;
-import com.asthereon.menus.MenuSchema;
+import com.asthereon.menus.Menu.*;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -34,6 +31,10 @@ public class Schema {
         menuBuilder.button(createSchemaButton(1));
         menuBuilder.button(createSchemaButton(2));
         menuBuilder.button(createSchemaButton(3));
+
+        Menu menu = menuBuilder.build();
+
+        menu.bindToCursorItemOverflow(CursorOverflowType.DROP);
 
         // Build the menu
         return menuBuilder.build();

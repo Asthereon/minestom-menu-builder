@@ -1,4 +1,4 @@
-package com.asthereon.menus;
+package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
 import com.asthereon.menus.Buttons.MenuPlaceholder;

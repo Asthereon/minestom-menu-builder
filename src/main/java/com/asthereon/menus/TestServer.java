@@ -2,10 +2,7 @@ package com.asthereon.menus;
 
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.TestServer.AsthCoreCommand;
-import com.asthereon.menus.Examples.BankCommand;
-import com.asthereon.menus.Examples.EnderChestCommand;
-import com.asthereon.menus.Examples.GiveCommand;
-import com.asthereon.menus.Examples.SchemaCommand;
+import com.asthereon.menus.Examples.*;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -32,6 +29,8 @@ public class TestServer {
         commandManager.register(new BankCommand());
         commandManager.register(new EnderChestCommand());
         commandManager.register(new GiveCommand());
+        commandManager.register(new FillCommand());
+        commandManager.register(new TestCommand());
         commandManager.register(new SchemaCommand());
     }
 }

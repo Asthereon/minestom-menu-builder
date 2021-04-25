@@ -1,9 +1,9 @@
 package com.asthereon.menus.Buttons;
 
-import com.asthereon.menus.ClickInfo;
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuClickType;
-import com.asthereon.menus.MenuManager;
+import com.asthereon.menus.Menu.ClickInfo;
+import com.asthereon.menus.Menu.Menu;
+import com.asthereon.menus.Menu.MenuClickType;
+import com.asthereon.menus.Menu.MenuManager;
 import net.minestom.server.data.Data;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;

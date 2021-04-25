@@ -1,13 +1,12 @@
 package com.asthereon.menus.Buttons;
 
-import com.asthereon.menus.ClickInfo;
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuClickType;
+import com.asthereon.menus.Menu.ClickInfo;
+import com.asthereon.menus.Menu.Menu;
+import com.asthereon.menus.Menu.MenuClickType;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.data.Data;
 import net.minestom.server.data.DataImpl;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -51,16 +50,12 @@ public class MenuButtonBuilder {
     }
 
     public MenuButtonBuilder amount(int amount) {
-        this.itemStack = this.itemStack.with(builder -> {
-            builder.amount(amount);
-        });
+        this.itemStack = this.itemStack.with(builder -> builder.amount(amount));
         return this;
     }
 
     public MenuButtonBuilder displayName(Component displayName) {
-        this.itemStack = this.itemStack.with(builder -> {
-            builder.displayName(displayName);
-        });
+        this.itemStack = this.itemStack.with(builder -> builder.displayName(displayName));
         return this;
     }
 
