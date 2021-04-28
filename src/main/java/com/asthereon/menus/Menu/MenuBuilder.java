@@ -1,7 +1,6 @@
 package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
-import com.asthereon.menus.Buttons.MenuPlaceholder;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.data.Data;
 import net.minestom.server.data.DataImpl;
@@ -22,7 +21,7 @@ public class MenuBuilder {
     private final UUID uuid;
     private final List<Integer> readOnlySlots = new ArrayList<>();
     private final List<MenuButton> buttons = new ArrayList<>();
-    private final List<MenuPlaceholder> menuPlaceholders = new ArrayList<>();
+    private final List<MenuButton> menuPlaceholders = new ArrayList<>();
     private final HashMap<String, MenuSection> sections = new HashMap<>();
     private Data metadata = new DataImpl();
 
@@ -136,12 +135,30 @@ public class MenuBuilder {
     }
 
     /**
-     * Adds a {@link MenuPlaceholder} to the Menu.
-     * @param menuPlaceholder the MenuPlaceholder to add to the Menu
+     * Adds a {@link MenuButton} that has no click effect
+     * @param slot the slot
+     * @param itemStack the item stack to display
      * @return this MenuBuilder
      */
-    public MenuBuilder placeholder(MenuPlaceholder menuPlaceholder) {
-        menuPlaceholders.add(menuPlaceholder);
+    public MenuBuilder placeholder(int slot, ItemStack itemStack) {
+        menuPlaceholders.add(MenuButton.builder()
+                .slot(slot)
+                .metadata("placeholder",itemStack)
+                .build());
+        return this;
+    }
+
+    /**
+     * Adds a {@link MenuButton} that has no click effect
+     * @param slots the slots
+     * @param itemStack the item stack to display
+     * @return this MenuBuilder
+     */
+    public MenuBuilder placeholder(Collection<Integer> slots, ItemStack itemStack) {
+        menuPlaceholders.add(MenuButton.builder()
+                .slots(slots)
+                .metadata("placeholder",itemStack)
+                .build());
         return this;
     }
 

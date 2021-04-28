@@ -1,8 +1,6 @@
 package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
-import com.asthereon.menus.Buttons.MenuPlaceholder;
-import com.asthereon.menus.Buttons.PageButton;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
@@ -18,10 +16,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * A Menu handles the assembly of the display of {@link MenuButton MenuButtons}, {@link MenuPlaceholder MenuPlaceholders},
- *  and {@link MenuSection MenuSections} in a {@link MenuInventory}. Menus also allow for binding code to run when a menu
- *  is loaded (opened), saved (closed), as well as how to handle items on the cursor when the menu is closed and the items
- *  cannot be returned to the player's inventory.
+ * A Menu handles the assembly of the display of {@link MenuButton MenuButtons} and {@link MenuSection MenuSections} in
+ *  a {@link MenuInventory}. Menus also allow for binding code to run when a menu is loaded (opened), saved (closed),
+ *  as well as how to handle items on the cursor when the menu is closed and the itemscannot be returned to the player's
+ *  inventory.
  */
 public class Menu {
 
@@ -29,7 +27,7 @@ public class Menu {
     private final UUID uuid;
     private final InventoryCondition readOnly;
     private final List<MenuButton> buttons;
-    private final List<MenuPlaceholder> menuPlaceholders;
+    private final List<MenuButton> menuPlaceholders;
     private final HashMap<String, MenuSection> sections;
     private final List<BiConsumer<MenuView, String>> onSave = new ArrayList<>();
     private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
@@ -39,7 +37,7 @@ public class Menu {
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
     // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
-    public Menu(UUID uuid, Data metadata, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuPlaceholder> menuPlaceholders, String storageData) {
+    public Menu(UUID uuid, Data metadata, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuButton> menuPlaceholders, String storageData) {
         this.uuid = uuid;
         this.metadata = metadata;
         this.inventory = inventory;
@@ -66,20 +64,11 @@ public class Menu {
         }
     }
 
-    protected void drawButton(PageButton pageButton) {
-        for (int slot : pageButton.getSlots()) {
-            inventory.setItemStack(slot, pageButton.getItemStack());
-        }
-
-        for (InventoryCondition inventoryCondition : pageButton.getInventoryConditions()) {
-            inventory.addInventoryCondition(inventoryCondition);
-        }
-    }
-
-    protected void drawPlaceholder(MenuPlaceholder menuPlaceholder) {
+    protected void drawPlaceholder(MenuButton menuPlaceholder) {
+        ItemStack itemStack = menuPlaceholder.getMetadata("placeholder",ItemStack.AIR);
         for (int slot : menuPlaceholder.getSlots()) {
             if (inventory.getItemStack(slot).isAir()) {
-                inventory.setItemStack(slot, menuPlaceholder.getItemStack());
+                inventory.setItemStack(slot, itemStack);
             }
         }
     }
@@ -116,9 +105,8 @@ public class Menu {
             section.draw();
         }
 
-        // Change the drawing of placeholders to be after menu sections, and check for air,
-        // so they can be used to replace the page buttons when they aren't displayed
-        for (MenuPlaceholder menuPlaceholder : menuPlaceholders) {
+        // Draw placeholders last to avoid stomping on buttons
+        for (MenuButton menuPlaceholder : menuPlaceholders) {
             drawPlaceholder(menuPlaceholder);
         }
 

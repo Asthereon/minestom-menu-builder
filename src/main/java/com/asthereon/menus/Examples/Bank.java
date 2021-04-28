@@ -27,12 +27,17 @@ public class Bank {
     public void open(Player player, @Nullable Data metadata) {
         // Create a schema
         MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
-                .mask("RRRRRRRRR");
+                .mask("RRRRRRRRR")
+                .mask("000000000")
+                .mask("000000000")
+                .mask("000000000")
+                .mask("000000000")
+                .mask("PPPPPPPPP");
 
         // Create a MenuBuilder with 6 rows and give it a title
         MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text(player.getUsername() + "'s Bank (Tab " + (metadata == null ? "1" : metadata.getOrDefault("bankTab", 0) + 1) + ")"))
-                // Set the top row of the menu to be read only (unable to be modified with click events)
-                .readOnlySlots(schema.getSlots('R'))
+                // Set the top and bottom rows of the menu to be read only (unable to be modified with click events)
+                .readOnlySlots(schema.getSlots("RP"))
                 // Transfer any existing metadata from a menu refresh due to tab changes
                 .metadata(metadata);
 
@@ -41,6 +46,9 @@ public class Bank {
             // Create and add the bank tab button to the menu
             menuBuilder.button(createBankTabButton(i));
         }
+
+        // Create all 9 placeholders
+        menuBuilder.placeholder(schema.getSlots('P'), BANK_PLACEHOLDER);
 
         // Build the menu
         Menu menu = menuBuilder.build();
@@ -89,6 +97,13 @@ public class Bank {
                             .build())
                     // Bind a Menu Consumer to the click event of this button
                     .click(Bank::switchTab);
+
+    // A static ItemStack to use for the bank placeholders
+    private static final ItemStack BANK_PLACEHOLDER =
+            ItemStack.builder(Material.BLACK_STAINED_GLASS_PANE)
+                    .displayName(AsthCore.getComponent("<reset>"))
+                    .amount(1)
+                    .build();
 
     // Click functionality for bank tabs
     private static void switchTab(Menu menu, ClickInfo clickInfo) {

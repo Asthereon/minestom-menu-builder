@@ -1,7 +1,6 @@
 package com.asthereon.menus.Menu;
 
 import com.asthereon.menus.Buttons.MenuButton;
-import com.asthereon.menus.Buttons.PageButton;
 import net.minestom.server.item.ItemStack;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class MenuSection {
     private UUID menuID;
     private final List<Integer> slots = new ArrayList<>();
     private final List<MenuButton> buttons = new ArrayList<>();
-    private final List<PageButton> pageButtons = new ArrayList<>();
+    private final List<MenuButton> pageButtons = new ArrayList<>();
     private final List<Integer> pageButtonSlots = new ArrayList<>();
     private int offset = 0;
     private int minimumVisible = 1;
@@ -115,22 +114,38 @@ public class MenuSection {
      * @param slot the slot to turn into a button
      * @param offset the amount to change the offset by, negative to display earlier items, positive to display later items
      * @param itemStack the item stack the button should display as
+     * @param placeholder the item stack that should display if there are no more buttons to display in the given direction
      * @return this MenuSection
      */
-    public MenuSection pageButton(int slot, int offset, ItemStack itemStack) {
+    public MenuSection pageButton(int slot, int offset, ItemStack itemStack, ItemStack placeholder) {
         if (pageButtonSlots.contains(slot)) {
             System.out.println("[Menu] MenuSection " + name + " tried to bind a page button to an existing slot");
             return this;
         }
         // Mark this slot as used by a page button
         pageButtonSlots.add(slot);
-        this.pageButtons.add(PageButton
+        this.pageButtons.add(MenuButton.builder()
                 .slot(slot)
                 .itemStack(itemStack)
-                .offset(offset)
-                .click(() -> setOffset(this.offset + offset))
+                .metadata("offset",offset,Integer.class)
+                .metadata("placeholder",placeholder,ItemStack.class)
+                .click((menu, clickInfo) -> setOffset(this.offset + offset))
+                .build()
         );
         return this;
+    }
+
+    /**
+     * Adds a button that will increment or decrement the offset to change what items are displayed within the
+     *  MenuSection
+     * @param slot the slot to turn into a button
+     * @param offset the amount to change the offset by, negative to display earlier items, positive to display later items
+     * @param itemStack the item stack the button should display as, defaults to AIR when there are no more buttons to
+     *                  display in the given direction
+     * @return this MenuSection
+     */
+    public MenuSection pageButton(int slot, int offset, ItemStack itemStack) {
+        return pageButton(slot, offset, itemStack, ItemStack.AIR);
     }
 
     /**
@@ -164,22 +179,22 @@ public class MenuSection {
                     }
                 }
             }
-            for (PageButton pageButton : this.pageButtons) {
+            for (MenuButton pageButton : this.pageButtons) {
+                Integer offset = pageButton.getMetadata("offset",0);
                 // IF the button is to decrement and there's more stuff to show
-                if (pageButton.isDecrement()) {
-                    if (offset > 0) {
+                if (offset < 0) {
+                    if (this.offset > 0) {
                         menu.drawButton(pageButton);
                     } else {
-                        // TODO: 4/27/2021 Update this to check the button's metadata for "placeholder" 
-                        menu.clearSlots(pageButton.getSlots());
+                        menu.drawPlaceholder(pageButton);
                     }
                 }
                 // ELSE IF the button is to increment and there's more stuff to show
-                else if (pageButton.isIncrement()) {
-                    if (offset < buttons.size() - minimumVisible) {
+                else if (offset > 0) {
+                    if (this.offset < buttons.size() - minimumVisible) {
                         menu.drawButton(pageButton);
                     } else {
-                        menu.clearSlots(pageButton.getSlots());
+                        menu.drawPlaceholder(pageButton);
                     }
                 }
             }

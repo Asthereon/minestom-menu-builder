@@ -75,12 +75,17 @@ public class MenuSchema {
     }
 
     /**
-     * Gets the slot indexes associated with a specific marker character, indicated by the first character of the string
-     * @param marker the string whose first character represents the slots desired
-     * @return the list of the slots associated with the marker, or any empty ArrayList if none
+     * Gets the slot indexes associated with each marker character in a string
+     * @param markers the string containing the marker characters
+     * @return the list of the slots associated with the markers, or any empty ArrayList if none
      */
-    public List<Integer> getSlots(String marker) {
-        return schemas.getOrDefault(marker.charAt(0), new ArrayList<>());
+    public List<Integer> getSlots(String markers) {
+        ArrayList<Integer> slots = new ArrayList<>();
+        char[] markerArray = markers.toCharArray();
+        for (char marker : markerArray) {
+            slots.addAll(schemas.getOrDefault(marker, new ArrayList<>()));
+        }
+        return slots;
     }
 
     @Override

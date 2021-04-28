@@ -106,4 +106,12 @@ public class MenuButton {
     public List<InventoryCondition> getInventoryConditions() {
         return inventoryConditions;
     }
+
+    public <T> T getMetadata(String key, T defaultValue) {
+        return metadata.getOrDefault(key, defaultValue);
+    }
+
+    public <T> void setMetadata(String key, T value, Class<T> type) { metadata.set(key, value, type); }
+
+    public <T> void setMetadata(String key, T value) { metadata.set(key, value); }
 }
