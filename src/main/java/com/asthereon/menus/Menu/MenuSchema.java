@@ -7,16 +7,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * A MenuSchema allows for simplified visual layouts to be created for a {@link Menu}. A MenuSchema may contain any
+ *  characters within the masks, and those characters will represent a group of slots. {@link MenuSchema#getSlots(char)}
+ *  accepts a character to search for, and will return all slot indexes that match the given character. A single
+ *  MenuSchema can provide the slot indexes for each character used to build it, making it a convenient way to lay out
+ *  all {@link com.asthereon.menus.Buttons.MenuButton MenuButtons} which will be displayed
+ */
 public class MenuSchema {
 
-    private int slotCount;
-    private int markerSlot = 0;
+    private final int slotCount;    // The number of slots in the inventory type
+    private int markerSlot = 0;     // The slot of the next marker to be added
     private final HashMap<Character, List<Integer>> schemas = new HashMap<>();
 
     public MenuSchema(InventoryType inventoryType) {
         slotCount = inventoryType.getSize();
     }
 
+    // This method will only mask the provided slots if they do not exceed the maximum size of the inventory
     private void mask(String slots) {
         // Get all the markers as a character array
         char[] markers = slots.replace(" ", "").toCharArray();
@@ -42,7 +50,14 @@ public class MenuSchema {
             }
         }
     }
-    
+
+    /**
+     * This method takes one or more strings and splits them up into their individual characters, then marks the
+     *  represented slots as represented by that character using the order they are provided and starting at slot index
+     *  0 for the specified inventory type.
+     * @param maskArray the mask strings
+     * @return this MenuSchema
+     */
     public MenuSchema mask(String... maskArray) {
         for (String slots : maskArray) {
             mask(slots);
@@ -50,10 +65,20 @@ public class MenuSchema {
         return this;
     }
 
+    /**
+     * Gets the slot indexes associated with a specific marker character
+     * @param marker the character that represents the slots desired
+     * @return the list of the slots associated with the marker, or any empty ArrayList if none
+     */
     public List<Integer> getSlots(char marker) {
         return schemas.getOrDefault(marker, new ArrayList<>());
     }
 
+    /**
+     * Gets the slot indexes associated with a specific marker character, indicated by the first character of the string
+     * @param marker the string whose first character represents the slots desired
+     * @return the list of the slots associated with the marker, or any empty ArrayList if none
+     */
     public List<Integer> getSlots(String marker) {
         return schemas.getOrDefault(marker.charAt(0), new ArrayList<>());
     }

@@ -2,6 +2,10 @@ package com.asthereon.menus.Menu;
 
 import net.minestom.server.entity.Player;
 
+/**
+ * This class represents a player and the {@link Menu} they are viewing, as a simplified argument to pass to Menu
+ *  events like onLoad(), onSave() and onCursorItemOverflow()
+ */
 public class MenuView {
 
     private final Menu menu;
@@ -20,11 +24,8 @@ public class MenuView {
         return player;
     }
 
-    public <T> T getMetadata(String key, T defaultValue) {
-        return this.menu.getMetadata(key, defaultValue);
-    }
-
+    // Pass-through methods to make Menu metadata easier to access
+    public <T> T getMetadata(String key, T defaultValue) { return this.menu.getMetadata(key, defaultValue); }
     public <T> void setMetadata(String key, T value, Class<T> type) { this.menu.setMetadata(key, value, type); }
-
     public <T> void setMetadata(String key, T value) { this.menu.setMetadata(key, value); }
 }

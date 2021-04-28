@@ -14,6 +14,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * A singleton manager that controls the references to the various menus that are created, as well as registering the
+ *  events to handle the inventory open and close events.
+ */
 public class MenuManager {
 
     // Instance
@@ -36,15 +40,12 @@ public class MenuManager {
         return instance;
     }
 
-    public static void init() {
-
-    }
-
-    public static void closeInventoryEvent(Player player, Inventory inventory) {
+    // Handles the cursor item overflow and close event for a player's open menu when their current menu is closed
+    private static void closeInventoryEvent(Player player, Inventory inventory) {
         if (inventory != null) {
-            if (MenuManager.getInstance().isMenu(player,inventory.getTitle())) {
-                Menu menu = MenuManager.getInstance().getMenu(player);
-                if (null != menu) {
+            Menu menu = MenuManager.getMenu(player);
+            if (null != menu) {
+                if (menu.getInventory().equals(inventory)) {
                     // Menu inventory closed, handle the menu cursor
                     CursorOverflow.handleCursorItem(player, CursorOverflow.getDefaultMenuOverflowType());
                     menu.closeEvent(player);
@@ -78,21 +79,17 @@ public class MenuManager {
         return MenuManager.getInstance()._unregister(uuid);
     }
 
-    public Menu _unregister(UUID uuid) {
+    private Menu _unregister(UUID uuid) {
         return menus.remove(uuid);
     }
 
-    public boolean isMenu(Player player, Component menuName) {
-        AtomicBoolean isMenu = new AtomicBoolean(false);
-        menus.forEach((uuid, menu) -> {
-            if (menu.getInventory().getViewers().contains(player)) {
-                if (menu.getTitle().equals(menuName)) {
-                    isMenu.set(true);
-                }
-            }
-        });
-
-        return isMenu.get();
+    /**
+     * Gets a {@link Menu} from a given menu UUID
+     * @param uuid the uuid of the menu
+     * @return the menu, or null if none was found with the given uuid
+     */
+    public static Menu getMenu(UUID uuid) {
+        return MenuManager.getInstance()._getMenu(uuid);
     }
 
     @Nullable
@@ -100,12 +97,15 @@ public class MenuManager {
         return menus.getOrDefault(uuid, null);
     }
 
-    public static Menu getMenu(UUID uuid) {
-        return MenuManager.getInstance()._getMenu(uuid);
-    }
-
+    /**
+     * Gets a {@link Menu} from a given player
+     * @param player the player whose menu should be found
+     * @return the menu, or null if none was found with the given player
+     */
     @Nullable
-    public Menu getMenu(Player player) {
+    public static Menu getMenu(Player player) { return MenuManager.getInstance()._getMenu(player); }
+
+    private Menu _getMenu(Player player) {
         for (Map.Entry<UUID, Menu> entry : menus.entrySet()) {
             if (entry.getValue().isPlayerViewing(player)) {
                 return entry.getValue();
@@ -114,6 +114,10 @@ public class MenuManager {
         return null;
     }
 
+    /**
+     * Forces a {@link Menu} with the given UUID to redraw itself
+     * @param uuid the uuid of the menu
+     */
     public static void redraw(UUID uuid) {
         Menu menu = getMenu(uuid);
         if (null != menu) {

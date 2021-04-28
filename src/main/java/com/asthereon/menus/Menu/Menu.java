@@ -8,6 +8,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
+import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.time.TimeUnit;
@@ -16,6 +17,12 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * A Menu handles the assembly of the display of {@link MenuButton MenuButtons}, {@link MenuPlaceholder MenuPlaceholders},
+ *  and {@link MenuSection MenuSections} in a {@link MenuInventory}. Menus also allow for binding code to run when a menu
+ *  is loaded (opened), saved (closed), as well as how to handle items on the cursor when the menu is closed and the items
+ *  cannot be returned to the player's inventory.
+ */
 public class Menu {
 
     private MenuInventory inventory;
@@ -49,7 +56,7 @@ public class Menu {
         MenuManager.register(this);
     }
 
-    public void drawButton(MenuButton menuButton) {
+    protected void drawButton(MenuButton menuButton) {
         for (int slot : menuButton.getSlots()) {
             inventory.setItemStack(slot, menuButton.getItemStack());
         }
@@ -59,7 +66,7 @@ public class Menu {
         }
     }
 
-    public void drawButton(PageButton pageButton) {
+    protected void drawButton(PageButton pageButton) {
         for (int slot : pageButton.getSlots()) {
             inventory.setItemStack(slot, pageButton.getItemStack());
         }
@@ -69,7 +76,7 @@ public class Menu {
         }
     }
 
-    public void drawPlaceholder(MenuPlaceholder menuPlaceholder) {
+    protected void drawPlaceholder(MenuPlaceholder menuPlaceholder) {
         for (int slot : menuPlaceholder.getSlots()) {
             if (inventory.getItemStack(slot).isAir()) {
                 inventory.setItemStack(slot, menuPlaceholder.getItemStack());
@@ -77,30 +84,20 @@ public class Menu {
         }
     }
 
-    public void clearSlot(int slot) {
+    protected void clearSlot(int slot) {
         inventory.setItemStack(slot, ItemStack.AIR);
     }
 
-    public void clearSlots(Collection<Integer> slots) {
+    protected void clearSlots(Collection<Integer> slots) {
         for (int slot : slots) {
             inventory.setItemStack(slot, ItemStack.AIR);
         }
     }
 
-    public void reset() {
-        inventory.clear();
-        inventory.clearInventoryConditions();
-    }
-
     public void redraw() {
         Set<Player> players = inventory.getViewers();
-        List<Integer> storageSlots = inventory.storageSlots;
+        List<Integer> storageSlots = inventory.getStorageSlots();
         String serializedData = inventory.serialize();
-
-        // TODO: 4/20/2021 It looks like this close inventory event combined with the one in Menu.open() are causing double saves
-//        for (Player player : players) {
-//            MenuManager.closeInventoryEvent(player, player.getOpenInventory());
-//        }
 
         // Make sure non-button items are copied over to the new inventory or stuff like banks will be impossible
         inventory = new MenuInventory(inventory.getInventoryType(), inventory.getTitle());
@@ -131,8 +128,6 @@ public class Menu {
     }
 
     public void open(Player player) {
-        //MenuManager.closeInventoryEvent(player, player.getOpenInventory());
-        // TODO: 4/20/2021 Need to differentiate between a close due to another menu opening, and closing current menu, so that closing the current menu will save the current tab
         load(player);
         redraw();
         player.openInventory(inventory);
@@ -187,6 +182,17 @@ public class Menu {
         defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(cursorOverflowType);
     }
 
+    protected void closeEvent(Player player) {
+        if (inventory.hasPersistentData()) {
+            String serializedData = inventory.serialize();
+            save(player, serializedData);
+        }
+    }
+
+    public boolean isPlayerViewing(Player player) {
+        return inventory.getViewers().contains(player);
+    }
+
     protected boolean isMenuCursorItemOverflow() {
         return menuCursorItemOverflow != null;
     }
@@ -207,22 +213,11 @@ public class Menu {
         return inventory.getTitle();
     }
 
-    public boolean isPlayerViewing(Player player) {
-        return inventory.getViewers().contains(player);
-    }
-
-    public String closeEvent(Player player) {
-        String serializedData = null;
-        if (inventory.hasPersistentData()) {
-            serializedData = inventory.serialize();
-            save(player, serializedData);
-        }
-        return serializedData;
-    }
-
     public MenuInventory getInventory() {
         return inventory;
     }
+
+    public InventoryType getInventoryType() { return this.inventory.getInventoryType(); }
 
     public UUID getUuid() {
         return uuid;
