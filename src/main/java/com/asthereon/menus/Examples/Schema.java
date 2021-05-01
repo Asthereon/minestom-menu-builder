@@ -1,9 +1,11 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
-import com.asthereon.menus.Buttons.MenuButton;
-import com.asthereon.menus.Buttons.MenuButtonBuilder;
+import com.asthereon.menus.Enums.CursorOverflowType;
+import com.asthereon.menus.Menu.MenuButton;
+import com.asthereon.menus.Menu.MenuButtonBuilder;
 import com.asthereon.menus.Menu.*;
+import com.asthereon.menus.Utils.ClickInfo;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;

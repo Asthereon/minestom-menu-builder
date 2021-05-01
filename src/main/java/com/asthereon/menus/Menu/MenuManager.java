@@ -1,6 +1,5 @@
 package com.asthereon.menus.Menu;
 
-import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -12,7 +11,6 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A singleton manager that controls the references to the various menus that are created, as well as registering the

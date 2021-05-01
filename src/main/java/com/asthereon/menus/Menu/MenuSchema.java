@@ -12,7 +12,7 @@ import java.util.List;
  *  characters within the masks, and those characters will represent a group of slots. {@link MenuSchema#getSlots(char)}
  *  accepts a character to search for, and will return all slot indexes that match the given character. A single
  *  MenuSchema can provide the slot indexes for each character used to build it, making it a convenient way to lay out
- *  all {@link com.asthereon.menus.Buttons.MenuButton MenuButtons} which will be displayed
+ *  all {@link MenuButton MenuButtons} which will be displayed
  */
 public class MenuSchema {
 

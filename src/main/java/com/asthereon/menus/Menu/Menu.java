@@ -1,6 +1,7 @@
 package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.Buttons.MenuButton;
+import com.asthereon.menus.Enums.CursorOverflowType;
+import com.asthereon.menus.Utils.MetadataContainer;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.data.Data;
@@ -21,10 +22,11 @@ import java.util.function.Consumer;
  *  as well as how to handle items on the cursor when the menu is closed and the itemscannot be returned to the player's
  *  inventory.
  */
-public class Menu {
+public class Menu extends MetadataContainer {
 
     private MenuInventory inventory;
     private final UUID uuid;
+    private boolean initialized = false;
     private final InventoryCondition readOnly;
     private final List<MenuButton> buttons;
     private final List<MenuButton> menuPlaceholders;
@@ -33,7 +35,6 @@ public class Menu {
     private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
     private BiConsumer<MenuView, ItemStack> menuCursorItemOverflow = null;
     private BiConsumer<Player, ItemStack> defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(CursorOverflowType.DEFAULT);
-    private final Data metadata;
 
     // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
     // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
@@ -54,6 +55,7 @@ public class Menu {
         MenuManager.register(this);
     }
 
+    // Draws a button by setting the item stack in the inventory, then adding its inventory condition to the menu
     protected void drawButton(MenuButton menuButton) {
         for (int slot : menuButton.getSlots()) {
             inventory.setItemStack(slot, menuButton.getItemStack());
@@ -64,6 +66,7 @@ public class Menu {
         }
     }
 
+    // Draws a placeholder by checking for placeholder metadata on a menu button, with no inventory condition
     protected void drawPlaceholder(MenuButton menuPlaceholder) {
         ItemStack itemStack = menuPlaceholder.getMetadata("placeholder",ItemStack.AIR);
         for (int slot : menuPlaceholder.getSlots()) {
@@ -73,16 +76,23 @@ public class Menu {
         }
     }
 
+    // Sets a slot to AIR
     protected void clearSlot(int slot) {
         inventory.setItemStack(slot, ItemStack.AIR);
     }
 
+    // Sets a collection of slots to AIR
     protected void clearSlots(Collection<Integer> slots) {
         for (int slot : slots) {
             inventory.setItemStack(slot, ItemStack.AIR);
         }
     }
 
+    /**
+     * Creates a new {@link MenuInventory}, populating it with the storage items obtained via serialization, then draws
+     *  the {@link MenuButton MenuButtons}, {@link MenuSection MenuSections}, and the placeholders. This method will
+     *  automatically open the new inventory to all the players who were viewing the previous inventory.
+     */
     public void redraw() {
         Set<Player> players = inventory.getViewers();
         List<Integer> storageSlots = inventory.getStorageSlots();
@@ -115,17 +125,33 @@ public class Menu {
         }
     }
 
+    // Used to cause the menu to redraw only if it has never been drawn before
+    private void initialize() {
+        if (!initialized) {
+            redraw();
+        }
+    }
+
+    /**
+     * Opens the {@link MenuInventory} to the player, triggering a redraw if the Menu has never been drawn
+     * @param player the player to open the menu to
+     */
     public void open(Player player) {
         load(player);
-        redraw();
+        initialize();
         player.openInventory(inventory);
     }
 
+    /**
+     * Closes this menu
+     * @param player
+     * @return
+     */
     public String close(Player player) {
         Inventory openInventory = player.getOpenInventory();
         String serializedData = null;
         if (openInventory != null) {
-            if (openInventory.getTitle().equals(inventory.getTitle())) {
+            if (openInventory.equals(inventory)) {
                 if (inventory.hasPersistentData()) {
                     serializedData = inventory.serialize();
                     save(player, serializedData);
@@ -210,17 +236,5 @@ public class Menu {
     public UUID getUuid() {
         return uuid;
     }
-
-    public Data getMetadata() {
-        return metadata;
-    }
-
-    public <T> T getMetadata(String key, T defaultValue) {
-        return metadata.getOrDefault(key, defaultValue);
-    }
-
-    public <T> void setMetadata(String key, T value, Class<T> type) { metadata.set(key, value, type); }
-
-    public <T> void setMetadata(String key, T value) { metadata.set(key, value); }
 }
 

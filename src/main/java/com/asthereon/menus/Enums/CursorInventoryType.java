@@ -1,4 +1,4 @@
-package com.asthereon.menus.Menu;
+package com.asthereon.menus.Enums;
 
 /**
  * This enum represents which inventory the cursor is stored on

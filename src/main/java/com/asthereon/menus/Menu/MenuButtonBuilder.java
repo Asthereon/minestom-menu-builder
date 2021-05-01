@@ -1,23 +1,20 @@
-package com.asthereon.menus.Buttons;
+package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.Menu.ClickInfo;
-import com.asthereon.menus.Menu.Menu;
-import com.asthereon.menus.Menu.MenuClickType;
+import com.asthereon.menus.Enums.MenuClickType;
+import com.asthereon.menus.Utils.ClickInfo;
+import com.asthereon.menus.Utils.MetadataContainer;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
 import net.minestom.server.item.ItemStack;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class MenuButtonBuilder {
+public class MenuButtonBuilder extends MetadataContainer {
 
     private ItemStack itemStack = ItemStack.AIR;
     private UUID uuid;
     private final List<Integer> slots = new ArrayList<>();
     private HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> inventoryConditions = new HashMap<>();
-    private final Data metadata = new DataImpl();
 
     private MenuButtonBuilder() { }
 

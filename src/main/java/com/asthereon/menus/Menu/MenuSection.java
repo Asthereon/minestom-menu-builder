@@ -1,6 +1,5 @@
 package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.Buttons.MenuButton;
 import net.minestom.server.item.ItemStack;
 
 import java.util.ArrayList;

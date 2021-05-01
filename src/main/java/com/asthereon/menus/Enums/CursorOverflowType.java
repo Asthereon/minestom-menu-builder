@@ -1,4 +1,4 @@
-package com.asthereon.menus.Menu;
+package com.asthereon.menus.Enums;
 
 /**
  * This enum indicates what should be done with items on the cursor that cannot fit in the player's inventory

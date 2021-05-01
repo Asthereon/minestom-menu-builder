@@ -1,6 +1,8 @@
 package com.asthereon.menus.Menu;
 
 import com.asthereon.asthcore.AsthCore;
+import com.asthereon.menus.Enums.CursorInventoryType;
+import com.asthereon.menus.Enums.CursorOverflowType;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;

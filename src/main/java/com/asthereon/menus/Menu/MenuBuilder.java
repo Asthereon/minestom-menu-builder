@@ -1,6 +1,5 @@
 package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.Buttons.MenuButton;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.data.Data;
 import net.minestom.server.data.DataImpl;
