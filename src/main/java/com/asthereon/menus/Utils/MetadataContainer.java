@@ -1,22 +1,21 @@
 package com.asthereon.menus.Utils;
 
-import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
-
 /**
  * A simple base class that handles metadata instantiation and pass-through methods.
  */
 public class MetadataContainer {
 
-    protected Data metadata = new DataImpl();
+    protected Metadata metadata = new Metadata();
 
     public boolean hasMetadata() {
         return metadata != null && !metadata.isEmpty();
     }
 
-    public Data getMetadata() {
+    public Metadata getMetadata() {
         return metadata;
     }
+
+    public void setMetadata(Metadata metadata) { this.metadata = metadata; }
 
     public <T> T getMetadata(String key, T defaultValue) {
         return metadata.getOrDefault(key, defaultValue);

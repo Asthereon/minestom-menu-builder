@@ -1,6 +1,7 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
+import com.asthereon.menus.Menu.MenuManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
@@ -31,10 +32,6 @@ public class EnderChestCommand extends Command {
 
         Player player = (Player) sender;
 
-        new EnderChest().open(player);
-
-        MinecraftServer.getSchedulerManager().buildTask(() -> {
-            new EnderChest().open(player);
-        }).delay(5, TimeUnit.SECOND).schedule();
+        MenuManager.open("EnderChest", player, null);
     }
 }

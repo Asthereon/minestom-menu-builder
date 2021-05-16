@@ -14,7 +14,7 @@ public class MenuButtonBuilder extends MetadataContainer {
     private ItemStack itemStack = ItemStack.AIR;
     private UUID uuid;
     private final List<Integer> slots = new ArrayList<>();
-    private HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> inventoryConditions = new HashMap<>();
+    private HashMap<MenuClickType, BiConsumer<MenuData, ClickInfo>> inventoryConditions = new HashMap<>();
 
     private MenuButtonBuilder() { }
 
@@ -56,16 +56,16 @@ public class MenuButtonBuilder extends MetadataContainer {
         return this;
     }
 
-    public MenuButtonBuilder inventoryCondition(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder inventoryCondition(MenuClickType menuClickType, BiConsumer<MenuData,ClickInfo> callback) {
         this.inventoryConditions.put(menuClickType, callback);
         return this;
     }
 
-    public MenuButtonBuilder click(BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder click(BiConsumer<MenuData,ClickInfo> callback) {
         return this.inventoryCondition(MenuClickType.ALL, callback);
     }
 
-    public MenuButtonBuilder click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder click(MenuClickType menuClickType, BiConsumer<MenuData,ClickInfo> callback) {
         return this.inventoryCondition(menuClickType, callback);
     }
 
@@ -92,7 +92,7 @@ public class MenuButtonBuilder extends MetadataContainer {
         return this;
     }
 
-    public HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> getInventoryConditions() {
+    public HashMap<MenuClickType, BiConsumer<MenuData, ClickInfo>> getInventoryConditions() {
         return inventoryConditions;
     }
 

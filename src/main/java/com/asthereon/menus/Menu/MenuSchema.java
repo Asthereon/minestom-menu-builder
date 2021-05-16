@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * A MenuSchema allows for simplified visual layouts to be created for a {@link Menu}. A MenuSchema may contain any
+ * A MenuSchema allows for simplified visual layouts to be created for a {@link MenuData}. A MenuSchema may contain any
  *  characters within the masks, and those characters will represent a group of slots. {@link MenuSchema#getSlots(char)}
  *  accepts a character to search for, and will return all slot indexes that match the given character. A single
  *  MenuSchema can provide the slot indexes for each character used to build it, making it a convenient way to lay out

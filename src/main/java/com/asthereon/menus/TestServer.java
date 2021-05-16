@@ -3,6 +3,8 @@ package com.asthereon.menus;
 import com.asthereon.asthcore.AsthCore;
 import com.asthereon.asthcore.TestServer.AsthCoreCommand;
 import com.asthereon.menus.Examples.*;
+import com.asthereon.menus.Menu.MenuManager;
+import com.asthereon.placeholders.PlaceholderManager;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -21,6 +23,8 @@ public class TestServer {
     public static void main(String[] args) {
         MinecraftServer minecraftServer = AsthCore.createTestServer();
         registerCommands();
+        registerMenus();
+        PlaceholderManager.registerDefaultPlaceholders();
         AsthCore.startTestServer(minecraftServer);
     }
 
@@ -32,5 +36,9 @@ public class TestServer {
         commandManager.register(new FillCommand());
         commandManager.register(new TestCommand());
         commandManager.register(new SchemaCommand());
+    }
+
+    private static void registerMenus() {
+        new Bank();
     }
 }

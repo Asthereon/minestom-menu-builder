@@ -20,7 +20,7 @@ public class ClickInfo extends MetadataContainer {
     private final ClickType clickType;
     private final InventoryConditionResult inventoryConditionResult;
 
-    public ClickInfo(Player player, int slot, ClickType clickType, InventoryConditionResult inventoryConditionResult, Data metadata) {
+    public ClickInfo(Player player, int slot, ClickType clickType, InventoryConditionResult inventoryConditionResult, Metadata metadata) {
         this.player = player;
         this.slot = slot;
         this.clickType = clickType;

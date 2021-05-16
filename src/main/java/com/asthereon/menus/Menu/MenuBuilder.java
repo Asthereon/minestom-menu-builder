@@ -1,42 +1,57 @@
 package com.asthereon.menus.Menu;
 
+import com.asthereon.menus.Utils.Metadata;
+import com.google.common.base.MoreObjects;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.condition.InventoryCondition;
 import net.minestom.server.item.ItemStack;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * A builder for creating {@link Menu Menus}
+ * A builder for creating {@link MenuData Menus}
  */
 public class MenuBuilder {
 
     private final MenuInventory inventory;
-    private String storageData = null;
     private boolean readOnly = false;
-    private final UUID uuid;
+    private final String menuID;
     private final List<Integer> readOnlySlots = new ArrayList<>();
     private final List<MenuButton> buttons = new ArrayList<>();
     private final List<MenuButton> menuPlaceholders = new ArrayList<>();
     private final HashMap<String, MenuSection> sections = new HashMap<>();
-    private Data metadata = new DataImpl();
-
-    private MenuBuilder(InventoryType inventoryType, Component title) {
+    private Metadata metadata = new Metadata();
+    private final List<BiConsumer<MenuView, String>> onSave = new ArrayList<>();
+    private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
+    private final List<BiConsumer<MenuView, ItemStack>> onCursorItemOverflow = new ArrayList<>();
+    private MenuBuilder(String menuID, InventoryType inventoryType, Component title) {
         this.inventory = new MenuInventory(inventoryType, title);
-        this.uuid = UUID.randomUUID();
+        this.menuID = menuID;
     }
 
     /**
      * Create a MenuBuilder for a menu with a given inventory type and title
+     * @param menuID the ID of the menu
      * @param inventoryType the type of inventory to use for the menu
      * @param title the title of the menu
      * @return the new MenuBuilder
      */
-    public static MenuBuilder of(InventoryType inventoryType, Component title) {
-        return new MenuBuilder(inventoryType, title);
+    public static MenuBuilder of(String menuID, InventoryType inventoryType, Component title) {
+        return new MenuBuilder(menuID, inventoryType, title);
+    }
+
+    /**
+     * Create a MenuBuilder for a menu with a given inventory type and title
+     * @param menu the menu
+     * @param inventoryType the type of inventory to use for the menu
+     * @param title the title of the menu
+     * @return the new MenuBuilder
+     */
+    public static MenuBuilder of(Menu menu, InventoryType inventoryType, Component title) {
+        return new MenuBuilder(menu.getMenuID(), inventoryType, title);
     }
 
     /**
@@ -98,12 +113,12 @@ public class MenuBuilder {
     }
 
     /**
-     * Sets the metadata for the {@link Menu} to the provided {@link Data} object. If this is not provided, it will
-     *  default to an empty {@link DataImpl} when the Menu is built.
+     * Sets the metadata for the {@link MenuData} to the provided {@link Metadata} object. If this is not provided, it will
+     *  default to an empty {@link Metadata} when the Menu is built.
      * @param metadata the metadata
      * @return this MenuBuilder
      */
-    public MenuBuilder metadata(Data metadata) {
+    public MenuBuilder metadata(Metadata metadata) {
         if (metadata != null) {
             this.metadata = metadata;
         }
@@ -129,7 +144,7 @@ public class MenuBuilder {
      */
     public MenuBuilder button(MenuButton menuButton) {
         // Set the UUID of the menu on the button, then add it to the buttons list
-        buttons.add(menuButton.uuid(uuid));
+        buttons.add(menuButton.menuID(menuID));
         return this;
     }
 
@@ -172,22 +187,31 @@ public class MenuBuilder {
     }
 
     /**
-     * Sets the serialized storage data to be sent to the {@link Menu}, which is used to populate the menu with a
-     *  default set of ItemStacks
-     * @param storageData the serialized storage data
+     * Adds a function to run when the menu is saved (closed)
+     * @param saveFunction the function to run when the menu is saved (closed)
      * @return this MenuBuilder
      */
-    public MenuBuilder storageData(String storageData) {
-        this.storageData = storageData;
+    public MenuBuilder onSave(BiConsumer<MenuView, String> saveFunction) {
+        this.onSave.add(saveFunction);
         return this;
     }
 
     /**
-     * Builds the {@link Menu} using this MenuBuilder, by creating a readOnlyCondition which handles cancelling interact
+     * Adds a function to run when the menu is loaded (opened)
+     * @param loadFunction the function to run when the menu is loaded (opened)
+     * @return this MenuBuilder
+     */
+    public MenuBuilder onLoad(Consumer<MenuView> loadFunction) {
+        this.onLoad.add(loadFunction);
+        return this;
+    }
+
+    /**
+     * Builds the {@link MenuData} using this MenuBuilder, by creating a readOnlyCondition which handles cancelling interact
      *  events with those slots, instantiating the Menu object, and setting up which slots are considered storage slots.
      * @return the new Menu
      */
-    public Menu build() {
+    public MenuData build() {
         InventoryCondition readOnlyCondition = null;
 
         if (readOnly) {
@@ -202,11 +226,11 @@ public class MenuBuilder {
             }
         }
 
-        Menu menu = new Menu(uuid, metadata, inventory, readOnlyCondition, buttons, sections, menuPlaceholders, storageData);
+        MenuData menuData = new MenuData(menuID, metadata, inventory, readOnlyCondition, buttons, sections, menuPlaceholders, onSave, onLoad);
 
         if (!readOnly) {
             // IF there are read only slots, that means there should be storage slots so set those on the menu
-            MenuInventory menuInventory = menu.getInventory();
+            MenuInventory menuInventory = menuData.getInventory();
             for (int i = 0; i < inventory.getSize(); i++) {
                 if (!readOnlySlots.contains(i)) {
                     menuInventory.storageSlot(i);
@@ -214,6 +238,6 @@ public class MenuBuilder {
             }
         }
 
-        return menu;
+        return menuData;
     }
 }

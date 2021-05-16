@@ -26,7 +26,8 @@ allprojects {
 
 dependencies {
     compile 'com.github.Minestom:Minestom:db619243da'
-    implementation 'com.github.Asthereon:minestom-asthcore:61eb1f807e'
+    api 'com.github.Asthereon:minestom-asthcore:61eb1f807e'
+    api 'com.github.Asthereon:minestom-placeholders:1caf9e86c4'
 }
 
 jar {

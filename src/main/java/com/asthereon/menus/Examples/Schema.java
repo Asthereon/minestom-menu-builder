@@ -11,7 +11,7 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
-public class Schema {
+public class Schema extends Menu {
 
     // Create a schema (spaces are removed and ignored, so they're allowed for easier readability)
     private static final MenuSchema schema = new MenuSchema(InventoryType.CHEST_6_ROW)
@@ -22,9 +22,10 @@ public class Schema {
             .mask("012 000 210")
             .mask("321 333 123");
 
-    public static Menu get() {
+    @Override
+    protected MenuData buildMenu() {
         // Create a MenuBuilder with 6 rows and give it a title
-        MenuBuilder menuBuilder = MenuBuilder.of(InventoryType.CHEST_6_ROW, Component.text("Schema Example"))
+        MenuBuilder menuBuilder = MenuBuilder.of(this, InventoryType.CHEST_6_ROW, Component.text("Schema Example"))
                 // Set the menu to be read only (unable to be modified with click events)
                 .readOnly(true);
 
@@ -34,12 +35,17 @@ public class Schema {
         menuBuilder.button(createSchemaButton(2));
         menuBuilder.button(createSchemaButton(3));
 
-        Menu menu = menuBuilder.build();
+        MenuData menuData = menuBuilder.build();
 
-        menu.bindToCursorItemOverflow(CursorOverflowType.DROP);
+        menuData.bindToCursorItemOverflow(CursorOverflowType.DROP);
 
         // Build the menu
         return menuBuilder.build();
+    }
+
+    @Override
+    public String getMenuID() {
+        return "Schema";
     }
 
     // Creates the MenuButton for a specific schema ID
@@ -70,7 +76,7 @@ public class Schema {
     private static final MenuButtonBuilder SCHEMA_BUTTON = MenuButton.builder().click(Schema::schemaButtonClick);
 
     // A simple click function that shows ClickInfo metadata functionality
-    private static void schemaButtonClick(Menu menu, ClickInfo clickInfo) {
+    private static void schemaButtonClick(MenuData menuData, ClickInfo clickInfo) {
         AsthCore.sendMessage(clickInfo.getPlayer(), "You clicked the Schema Button " + clickInfo.getMetadata("schemaButtonID", 0));
     }
 }

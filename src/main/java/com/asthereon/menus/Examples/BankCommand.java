@@ -1,6 +1,7 @@
 package com.asthereon.menus.Examples;
 
 import com.asthereon.asthcore.AsthCore;
+import com.asthereon.menus.Menu.MenuManager;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
@@ -29,6 +30,6 @@ public class BankCommand extends Command {
 
         Player player = (Player) sender;
 
-        new Bank().open(player, null);
+        MenuManager.open("Bank", player, null);
     }
 }

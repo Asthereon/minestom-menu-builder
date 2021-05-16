@@ -1,240 +1,62 @@
 package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.Enums.CursorOverflowType;
-import com.asthereon.menus.Utils.MetadataContainer;
-import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.data.Data;
+import com.asthereon.menus.Utils.Metadata;
 import net.minestom.server.entity.Player;
-import net.minestom.server.inventory.Inventory;
-import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.inventory.condition.InventoryCondition;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.utils.time.TimeUnit;
 
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
- * A Menu handles the assembly of the display of {@link MenuButton MenuButtons} and {@link MenuSection MenuSections} in
- *  a {@link MenuInventory}. Menus also allow for binding code to run when a menu is loaded (opened), saved (closed),
- *  as well as how to handle items on the cursor when the menu is closed and the itemscannot be returned to the player's
- *  inventory.
+ * All Menus that use this system extend must extend this class, which provides some boilerplate code such as registering
+ *  the new Menu with the MenuManager and the MenuData that provides the data for the Menu.
  */
-public class Menu extends MetadataContainer {
+abstract public class Menu {
 
-    private MenuInventory inventory;
-    private final UUID uuid;
-    private boolean initialized = false;
-    private final InventoryCondition readOnly;
-    private final List<MenuButton> buttons;
-    private final List<MenuButton> menuPlaceholders;
-    private final HashMap<String, MenuSection> sections;
-    private final List<BiConsumer<MenuView, String>> onSave = new ArrayList<>();
-    private final List<Consumer<MenuView>> onLoad = new ArrayList<>();
-    private BiConsumer<MenuView, ItemStack> menuCursorItemOverflow = null;
-    private BiConsumer<Player, ItemStack> defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(CursorOverflowType.DEFAULT);
-
-    // TODO: 4/19/2021 Maybe add an error that's thrown when trying to build a menu with read only slots that just have air?
-    // TODO: 4/19/2021 Try making all buttons have a StackingRule max stack size of 1, see if it still lets you have larger stacks by direct setting
-    public Menu(UUID uuid, Data metadata, MenuInventory inventory, InventoryCondition readOnly, List<MenuButton> buttons, HashMap<String, MenuSection> sections, List<MenuButton> menuPlaceholders, String storageData) {
-        this.uuid = uuid;
-        this.metadata = metadata;
-        this.inventory = inventory;
-        this.readOnly = readOnly;
-        this.buttons = buttons;
-        this.sections = sections;
-        this.sections.forEach((name,section) -> section.setMenu(this.getUuid()));
-        this.menuPlaceholders = menuPlaceholders;
-        MinecraftServer.getSchedulerManager().buildTask(() -> {
-            if (storageData != null) {
-                this.inventory.deserialize(storageData);
-            }
-        }).delay(1, TimeUnit.TICK).schedule();
-        MenuManager.register(this);
-    }
-
-    // Draws a button by setting the item stack in the inventory, then adding its inventory condition to the menu
-    protected void drawButton(MenuButton menuButton) {
-        for (int slot : menuButton.getSlots()) {
-            inventory.setItemStack(slot, menuButton.getItemStack());
-        }
-
-        for (InventoryCondition inventoryCondition : menuButton.getInventoryConditions()) {
-            inventory.addInventoryCondition(inventoryCondition);
-        }
-    }
-
-    // Draws a placeholder by checking for placeholder metadata on a menu button, with no inventory condition
-    protected void drawPlaceholder(MenuButton menuPlaceholder) {
-        ItemStack itemStack = menuPlaceholder.getMetadata("placeholder",ItemStack.AIR);
-        for (int slot : menuPlaceholder.getSlots()) {
-            if (inventory.getItemStack(slot).isAir()) {
-                inventory.setItemStack(slot, itemStack);
-            }
-        }
-    }
-
-    // Sets a slot to AIR
-    protected void clearSlot(int slot) {
-        inventory.setItemStack(slot, ItemStack.AIR);
-    }
-
-    // Sets a collection of slots to AIR
-    protected void clearSlots(Collection<Integer> slots) {
-        for (int slot : slots) {
-            inventory.setItemStack(slot, ItemStack.AIR);
-        }
-    }
+    // The menudata that provides the server-side data that is needed for menus
+    private MenuData menuData;
 
     /**
-     * Creates a new {@link MenuInventory}, populating it with the storage items obtained via serialization, then draws
-     *  the {@link MenuButton MenuButtons}, {@link MenuSection MenuSections}, and the placeholders. This method will
-     *  automatically open the new inventory to all the players who were viewing the previous inventory.
-     */
-    public void redraw() {
-        Set<Player> players = inventory.getViewers();
-        List<Integer> storageSlots = inventory.getStorageSlots();
-        String serializedData = inventory.serialize();
-
-        // Make sure non-button items are copied over to the new inventory or stuff like banks will be impossible
-        inventory = new MenuInventory(inventory.getInventoryType(), inventory.getTitle());
-        inventory.storageSlots(storageSlots);
-        inventory.deserialize(serializedData);
-
-        if (readOnly != null) {
-            inventory.addInventoryCondition(readOnly);
-        }
-
-        for (MenuButton button : buttons) {
-            drawButton(button);
-        }
-
-        for (MenuSection section : sections.values()) {
-            section.draw();
-        }
-
-        // Draw placeholders last to avoid stomping on buttons
-        for (MenuButton menuPlaceholder : menuPlaceholders) {
-            drawPlaceholder(menuPlaceholder);
-        }
-
-        for (Player player : players) {
-            player.openInventory(inventory);
-        }
-    }
-
-    // Used to cause the menu to redraw only if it has never been drawn before
-    private void initialize() {
-        if (!initialized) {
-            redraw();
-        }
-    }
-
-    /**
-     * Opens the {@link MenuInventory} to the player, triggering a redraw if the Menu has never been drawn
+     * Opens the menu to the player with the supplied metadata
      * @param player the player to open the menu to
+     * @param metadata the metadata to apply to the menu view
      */
-    public void open(Player player) {
-        load(player);
-        initialize();
-        player.openInventory(inventory);
+    public void open(Player player, @Nullable Metadata metadata) {
+        menuData.open(player, metadata);
     }
 
     /**
-     * Closes this menu
-     * @param player
-     * @return
+     * Default constructor that initializes the menu by adding it to the MenuManager and building the {@link MenuData}
      */
-    public String close(Player player) {
-        Inventory openInventory = player.getOpenInventory();
-        String serializedData = null;
-        if (openInventory != null) {
-            if (openInventory.equals(inventory)) {
-                if (inventory.hasPersistentData()) {
-                    serializedData = inventory.serialize();
-                    save(player, serializedData);
-                }
-                player.closeInventory();
-            }
-        }
-        return serializedData;
+    public Menu() {
+        initialize();
     }
 
-    public void bindToSave(BiConsumer<MenuView, String> saveFunction) {
-        onSave.add(saveFunction);
-    }
-
-    private void save(Player player, String serializedData) {
-        MenuView menuView = new MenuView(this, player);
-        for (BiConsumer<MenuView, String> saveFunction : onSave) {
-            saveFunction.accept(menuView, serializedData);
+    // Initialization that builds the MenuData
+    private void initialize() {
+        if (menuData == null) {
+            menuData = buildMenu();
+            MenuManager.register(this);
         }
     }
 
-    public void bindToLoad(Consumer<MenuView> loadFunction) {
-        onLoad.add(loadFunction);
-    }
+    /**
+     * This method is used to generate the {@link MenuData} for this menu, including buttons, placeholders, save and load
+     *  functionality, and cursor item overflow handling.
+     * @return the MenuData for the menu
+     */
+    abstract protected MenuData buildMenu();
 
-    private void load(Player player) {
-        MenuView menuView = new MenuView(this, player);
-        for (Consumer<MenuView> loadFunction : onLoad) {
-            loadFunction.accept(menuView);
-        }
-    }
+    /**
+     * This is the string value that is used with {@link MenuManager#getMenu(String)} to fetch the appropriate menu
+     * @return the menu ID
+     */
+    abstract public String getMenuID();
 
-    // Sets the cursor item overflow handler to be menu specific
-    public void bindToCursorItemOverflow(BiConsumer<MenuView, ItemStack> cursorItemOverflowFunction) {
-        defaultCursorItemOverflow = null;
-        menuCursorItemOverflow = cursorItemOverflowFunction;
-    }
-
-    // Sets the cursor item overflow handler to be a generic type that can't access menu specific data
-    public void bindToCursorItemOverflow(CursorOverflowType cursorOverflowType) {
-        menuCursorItemOverflow = null;
-        defaultCursorItemOverflow = CursorOverflow.getCursorOverflowHandler(cursorOverflowType);
-    }
-
-    protected void closeEvent(Player player) {
-        if (inventory.hasPersistentData()) {
-            String serializedData = inventory.serialize();
-            save(player, serializedData);
-        }
-    }
-
-    public boolean isPlayerViewing(Player player) {
-        return inventory.getViewers().contains(player);
-    }
-
-    protected boolean isMenuCursorItemOverflow() {
-        return menuCursorItemOverflow != null;
-    }
-
-    protected boolean isDefaultCursorItemOverflow() {
-        return defaultCursorItemOverflow != null;
-    }
-
-    protected BiConsumer<MenuView, ItemStack> getMenuCursorItemOverflow() {
-        return menuCursorItemOverflow;
-    }
-
-    protected BiConsumer<Player, ItemStack> getDefaultCursorItemOverflow() {
-        return defaultCursorItemOverflow;
-    }
-
-    public Component getTitle() {
-        return inventory.getTitle();
-    }
-
-    public MenuInventory getInventory() {
-        return inventory;
-    }
-
-    public InventoryType getInventoryType() { return this.inventory.getInventoryType(); }
-
-    public UUID getUuid() {
-        return uuid;
+    /**
+     * Gets the {@link MenuData} associated with this menu.  Generally you should avoid touching this unless you have a
+     *  good reason to, as it can break some of the internals if not careful.
+     * @return the MenuData for this menu
+     */
+    public MenuData getMenuData() {
+        return menuData;
     }
 }
-

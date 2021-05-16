@@ -107,16 +107,22 @@ public class CursorOverflow {
 
         // IF the cursor overflow type is a menu
         if (cursorOverflowType.equals(CursorOverflowType.MENU)) {
-            Menu menu = MenuManager.getInstance().getMenu(player);
+            Menu menu = MenuManager.getMenu(player);
             if (null != menu) {
-                // IF the menu has a menu-specific cursor item overflow handler
-                if (menu.isMenuCursorItemOverflow()) {
-                    // Use the cursor item overflow handler from the menu
-                    menu.getMenuCursorItemOverflow().accept(new MenuView(menu, player), itemStack);
-                    return;
+                MenuData menuData = menu.getMenuData();
+                if (null != menuData) {
+                    // IF the menu has a menu-specific cursor item overflow handler
+                    if (menuData.isMenuCursorItemOverflow()) {
+                        // Use the cursor item overflow handler from the menu
+                        menuData.getMenuCursorItemOverflow().accept(new MenuView(menuData, player), itemStack);
+                        return;
+                    } else {
+                        // Use the default cursor item overflow handler for the menu
+                        cursorOverflowHandler = menuData.getDefaultCursorItemOverflow();
+                    }
                 } else {
-                    // Use the default cursor item overflow handler for the menu
-                    cursorOverflowHandler = menu.getDefaultCursorItemOverflow();
+                    // The menu is unrecognized, set the handler to the default
+                    cursorOverflowHandler = DEFAULT;
                 }
             } else {
                 // The menu is unrecognized, set the handler to the default

@@ -5,17 +5,16 @@ import net.minestom.server.item.ItemStack;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 /**
- * A MenuSection is an automatically paginated group of slots on a {@link Menu} which takes a list of {@link MenuButton}
+ * A MenuSection is an automatically paginated group of slots on a {@link MenuData} which takes a list of {@link MenuButton}
  *  that will be displayed in the list of slots assigned to this MenuSection. The MenuButtons displayed in the slots are
  *  controlled by an offset which is modified by adding page buttons that increment and decrement the offset.
  */
 public class MenuSection {
 
     private final String name;
-    private UUID menuID;
+    private String menuID;
     private final List<Integer> slots = new ArrayList<>();
     private final List<MenuButton> buttons = new ArrayList<>();
     private final List<MenuButton> pageButtons = new ArrayList<>();
@@ -128,7 +127,13 @@ public class MenuSection {
                 .itemStack(itemStack)
                 .metadata("offset",offset,Integer.class)
                 .metadata("placeholder",placeholder,ItemStack.class)
-                .click((menu, clickInfo) -> setOffset(this.offset + offset))
+                .click((menu, clickInfo) -> {
+                    MenuView menuView = menu.getMenuView(clickInfo.getPlayer());
+                    if (menuView != null) {
+                        menuView.addSectionOffset(this.name, offset);
+                        //setOffset(this.offset + offset);
+                    }
+                })
                 .build()
         );
         return this;
@@ -150,51 +155,48 @@ public class MenuSection {
     /**
      * Sets all the slots associated with the MenuSection display to AIR
      */
-    public void clearSlots() {
-        Menu menu = MenuManager.getMenu(menuID);
-        if (null != menu) {
-            menu.clearSlots(slots);
+    public void clearSlots(MenuView menuView) {
+        if (null != menuView) {
+            menuView.clearSlots(slots);
         }
     }
 
     /**
      * Draws the MenuButtons for the MenuSection, as well as the buttons for incrementing and decrementing the offset
      */
-    protected void draw() {
-        Menu menu = MenuManager.getMenu(menuID);
-        if (null != menu) {
-            if (slots.size() > 0) {
-                if (buttons.size() > 0) {
-                    int index = offset;
-                    for (int slot : slots) {
-                        if (index < buttons.size()) {
-                            MenuButton menuButton = buttons.get(index);
-                            menuButton.setSlot(slot);
-                            menu.drawButton(menuButton);
-                            index++;
-                        } else {
-                            menu.clearSlot(slot);
-                        }
+    protected void draw(MenuView menuView) {
+        int sectionOffset = menuView.getSectionOffset(this.name);
+        if (slots.size() > 0) {
+            if (buttons.size() > 0) {
+                int index = sectionOffset;
+                for (int slot : slots) {
+                    if (index < buttons.size()) {
+                        MenuButton menuButton = buttons.get(index);
+                        menuButton.setSlot(slot);
+                        menuView.drawButton(menuButton);
+                        index++;
+                    } else {
+                        menuView.clearSlot(slot);
                     }
                 }
             }
-            for (MenuButton pageButton : this.pageButtons) {
-                Integer offset = pageButton.getMetadata("offset",0);
-                // IF the button is to decrement and there's more stuff to show
-                if (offset < 0) {
-                    if (this.offset > 0) {
-                        menu.drawButton(pageButton);
-                    } else {
-                        menu.drawPlaceholder(pageButton);
-                    }
+        }
+        for (MenuButton pageButton : this.pageButtons) {
+            Integer offset = pageButton.getMetadata("offset",0);
+            // IF the button is to decrement and there's more stuff to show
+            if (offset < 0) {
+                if (sectionOffset > 0) {
+                    menuView.drawButton(pageButton);
+                } else {
+                    menuView.drawPlaceholder(pageButton);
                 }
-                // ELSE IF the button is to increment and there's more stuff to show
-                else if (offset > 0) {
-                    if (this.offset < buttons.size() - minimumVisible) {
-                        menu.drawButton(pageButton);
-                    } else {
-                        menu.drawPlaceholder(pageButton);
-                    }
+            }
+            // ELSE IF the button is to increment and there's more stuff to show
+            else if (offset > 0) {
+                if (sectionOffset < buttons.size() - minimumVisible) {
+                    menuView.drawButton(pageButton);
+                } else {
+                    menuView.drawPlaceholder(pageButton);
                 }
             }
         }
@@ -202,6 +204,23 @@ public class MenuSection {
 
     public String getName() { return name; }
     public int getOffset() { return offset; }
-    public void setMenu(UUID menuID) { this.menuID = menuID; }
+
+    public List<Integer> getSlots() {
+        return slots;
+    }
+
+    public List<MenuButton> getButtons() {
+        return buttons;
+    }
+
+    public List<MenuButton> getPageButtons() {
+        return pageButtons;
+    }
+
+    public int getMinimumVisible() {
+        return minimumVisible;
+    }
+
+    public void setMenu(String menuID) { this.menuID = menuID; }
     public List<Integer> getPageButtonSlots() { return pageButtonSlots; }
 }
