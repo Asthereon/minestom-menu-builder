@@ -1,24 +1,20 @@
-package com.asthereon.menus.Buttons;
+package com.asthereon.menus.Menu;
 
-import com.asthereon.menus.ClickInfo;
-import com.asthereon.menus.Menu;
-import com.asthereon.menus.MenuClickType;
+import com.asthereon.menus.Enums.MenuClickType;
+import com.asthereon.menus.Utils.ClickInfo;
+import com.asthereon.menus.Utils.MetadataContainer;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.data.Data;
-import net.minestom.server.data.DataImpl;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class MenuButtonBuilder {
+public class MenuButtonBuilder extends MetadataContainer {
 
     private ItemStack itemStack = ItemStack.AIR;
     private UUID uuid;
     private final List<Integer> slots = new ArrayList<>();
-    private HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> inventoryConditions = new HashMap<>();
-    private final Data metadata = new DataImpl();
+    private HashMap<MenuClickType, BiConsumer<MenuData, ClickInfo>> inventoryConditions = new HashMap<>();
 
     private MenuButtonBuilder() { }
 
@@ -51,29 +47,25 @@ public class MenuButtonBuilder {
     }
 
     public MenuButtonBuilder amount(int amount) {
-        this.itemStack = this.itemStack.with(builder -> {
-            builder.amount(amount);
-        });
+        this.itemStack = this.itemStack.with(builder -> builder.amount(amount));
         return this;
     }
 
     public MenuButtonBuilder displayName(Component displayName) {
-        this.itemStack = this.itemStack.with(builder -> {
-            builder.displayName(displayName);
-        });
+        this.itemStack = this.itemStack.with(builder -> builder.displayName(displayName));
         return this;
     }
 
-    public MenuButtonBuilder inventoryCondition(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder inventoryCondition(MenuClickType menuClickType, BiConsumer<MenuData,ClickInfo> callback) {
         this.inventoryConditions.put(menuClickType, callback);
         return this;
     }
 
-    public MenuButtonBuilder click(BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder click(BiConsumer<MenuData,ClickInfo> callback) {
         return this.inventoryCondition(MenuClickType.ALL, callback);
     }
 
-    public MenuButtonBuilder click(MenuClickType menuClickType, BiConsumer<Menu,ClickInfo> callback) {
+    public MenuButtonBuilder click(MenuClickType menuClickType, BiConsumer<MenuData,ClickInfo> callback) {
         return this.inventoryCondition(menuClickType, callback);
     }
 
@@ -100,7 +92,7 @@ public class MenuButtonBuilder {
         return this;
     }
 
-    public HashMap<MenuClickType, BiConsumer<Menu, ClickInfo>> getInventoryConditions() {
+    public HashMap<MenuClickType, BiConsumer<MenuData, ClickInfo>> getInventoryConditions() {
         return inventoryConditions;
     }
 
